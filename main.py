@@ -19,9 +19,17 @@ def game_loop():
 def update_ui():
     souls_label.config(text=f"Souls: {souls:.1f}")
     skeletons_label.config(text=f"Skeletons: {skeleton_count}")
-    buy_skeleton_button.config(text=f"Buy Skeleton (Cost: {skeleton_cost})")
     zombies_label.config(text=f"Zombies: {zombie_count}")
+    buy_skeleton_button.config(text=f"Buy Skeleton (Cost: {skeleton_cost})")
     buy_zombie_button.config(text=f"Buy Zombie (Cost: {zombie_cost})")
+    update_button_state(buy_zombie_button, zombie_cost)
+    update_button_state(buy_skeleton_button, skeleton_cost)
+
+def update_button_state(button, cost):
+    if souls >= cost:
+        button.config(state="normal")
+    else:
+        button.config(state="disabled")
 
 def collect_soul():
     global souls
@@ -61,10 +69,10 @@ zombies_label.pack(pady=20)
 collect_button = tk.Button(root, text="Collect Soul", command=collect_soul)
 collect_button.pack()
 
-buy_skeleton_button = tk.Button(root, text="Buy Skeleton (Cost: 1)", command=buy_skeleton)
+buy_skeleton_button = tk.Button(root, text="Buy Skeleton (Cost: 1)", command=buy_skeleton, state="disabled")
 buy_skeleton_button.pack()
 
-buy_zombie_button = tk.Button(root, text="Buy Zombie (Cost: 10)", command=buy_zombie)
+buy_zombie_button = tk.Button(root, text="Buy Zombie (Cost: 10)", command=buy_zombie, state="disabled")
 buy_zombie_button.pack()
 
 update_ui()
