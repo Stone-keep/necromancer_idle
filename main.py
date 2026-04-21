@@ -2,25 +2,84 @@ import tkinter as tk
 import math
 
 # Game variables
-souls = 0 # current souls (basic currency in this game)
+tick_rate = 1000
+tick_count = 0
+souls = 0
+souls_multiplier = 1
+total_souls_gained = 0
+total_souls_spent = 0
 click_count = 0
 click_power = 0.1
-total_souls_earned = 0 # all souls ever gained
-total_souls_spent = 0 # all souls ever spent
-total_ticks = 0 # number of times the game logic has updated ("ticked")
 skeleton_count = 0
 skeleton_cost = 1
+skeleton_power = 0.1
 zombie_count = 0
 zombie_cost = 10
+zombie_power = 0.5
+
+# Upgrades
+upgrades = [
+{
+    "id": 1,
+    "name": "Upgrade #1",
+    "cost": 20,
+    "bought": False,
+    "requirement_type": "click_count",
+    "requirement_value": 100,
+    "effect_type": "click_power",
+    "effect_value": 10
+},
+{
+    "id": 2,
+    "name": "Upgrade #2",
+    "cost": 50,
+    "bought": False,
+    "requirement_type": "skeleton_count",
+    "requirement_value": 10,
+    "effect_type": "skeleton_power",
+    "effect_value": 2
+},
+{
+    "id": 3,
+    "name": "Upgrade #3",
+    "cost": 300,
+    "bought": False,
+    "requirement_type": "zombie_count",
+    "requirement_value": 10,
+    "effect_type": "zombie_power",
+    "effect_value": 2
+},
+{
+    "id": 4,
+    "name": "Upgrade #4",
+    "cost": 500,
+    "bought": False,
+    "requirement_type": "total_souls_gained",
+    "requirement_value": 1000,
+    "effect_type": "souls_multiplier",
+    "effect_value": 1.2
+},
+{
+    "id": 5,
+    "name": "Upgrade #5",
+    "cost": 1000,
+    "bought": False,
+    "requirement_type": "tick_count",
+    "requirement_value": 300,
+    "effect_type": "tick_rate",
+    "effect_value": 0.9
+}
+]
+
 
 # Functions
 def game_loop():
-    global total_ticks
-    total_ticks += 1
-    passive_gain = skeleton_count * 0.1 + zombie_count * 0.5
-    add_souls(passive_gain)
-    update_ui() #just in case I miss some update somewhere
-    root.after(1000, game_loop)
+    global tick_count
+    tick_count += 1
+    passive_gain = (skeleton_count * skeleton_power) + (zombie_count * zombie_power)
+    gain_souls(passive_gain)
+    update_ui()
+    root.after(tick_rate, game_loop)
 
 def update_ui():
     souls_label.config(text=f"Souls: {souls:.1f}")
@@ -37,36 +96,49 @@ def update_button_state(button, cost):
     else:
         button.config(state="disabled")
 
-def add_souls(amount):
-    global souls, total_souls_earned
-    souls = round(souls + amount, 1)
-    total_souls_earned = round(total_souls_earned + amount, 1)
-    update_ui()
+def is_upgrade_unlocked(upgrade):
+    requirements_map = {
+    "click_count": click_count,
+    "skeleton_count": skeleton_count,
+    "zombie_count": zombie_count,
+    "total_souls_gained": total_souls_gained,
+    "tick_count": tick_count
+}
+    req_type = upgrade["requirement_type"]
+    req_value = upgrade["requirement_value"]
+    return requirements_map[req_type] >= req_value
+
+def gain_souls(amount):
+    global souls, total_souls_gained
+    souls = round(souls + (amount * souls_multiplier), 1)
+    total_souls_gained = round(total_souls_gained + (amount * souls_multiplier), 1)
 
 def spend_souls(cost):
-    global souls
+    global souls, total_souls_spent
     souls = round(souls - cost, 1)
     total_souls_spent = round(total_souls_spent + cost, 1)
-    update_ui()
 
 def collect_soul_click():
     global click_count
     click_count += 1
-    add_souls(click_power)
+    gain_souls(click_power)
+    update_ui()
 
 def buy_skeleton():
-    global souls, skeleton_cost, skeleton_count
+    global skeleton_cost, skeleton_count
     if souls >= skeleton_cost:
+        spend_souls(skeleton_cost)
         skeleton_count += 1
         skeleton_cost = math.ceil(skeleton_cost * 1.5)
-        spend_souls(skeleton_cost)
+        update_ui()
        
 def buy_zombie():
-    global souls, zombie_cost, zombie_count
+    global zombie_cost, zombie_count
     if souls >= zombie_cost:
+        spend_souls(zombie_cost)
         zombie_count += 1
         zombie_cost = math.ceil(zombie_cost * 1.5)
-        spend_souls(zombie_cost)
+        update_ui()
 
 # UI
 root = tk.Tk()
