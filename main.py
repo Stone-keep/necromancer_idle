@@ -24,8 +24,7 @@ upgrades = [
     "name": "Upgrade #1",
     "cost": 20,
     "bought": False,
-    "requirement_type": "click_count",
-    "requirement_value": 100,
+    "requirement": lambda: click_count >= 100,
     "effect_type": "click_power",
     "effect_value": 10
 },
@@ -34,8 +33,7 @@ upgrades = [
     "name": "Upgrade #2",
     "cost": 50,
     "bought": False,
-    "requirement_type": "skeleton_count",
-    "requirement_value": 10,
+    "requirement": lambda: skeleton_count >= 10,
     "effect_type": "skeleton_power",
     "effect_value": 2
 },
@@ -44,8 +42,7 @@ upgrades = [
     "name": "Upgrade #3",
     "cost": 300,
     "bought": False,
-    "requirement_type": "zombie_count",
-    "requirement_value": 10,
+    "requirement": lambda: zombie_count >= 10,
     "effect_type": "zombie_power",
     "effect_value": 2
 },
@@ -54,8 +51,7 @@ upgrades = [
     "name": "Upgrade #4",
     "cost": 500,
     "bought": False,
-    "requirement_type": "total_souls_gained",
-    "requirement_value": 1000,
+    "requirement": lambda: total_souls_gained >= 1000,
     "effect_type": "souls_multiplier",
     "effect_value": 1.2
 },
@@ -64,8 +60,7 @@ upgrades = [
     "name": "Upgrade #5",
     "cost": 1000,
     "bought": False,
-    "requirement_type": "tick_count",
-    "requirement_value": 300,
+    "requirement": lambda: tick_count >= 300,
     "effect_type": "tick_rate",
     "effect_value": 0.9
 }
@@ -79,6 +74,7 @@ def game_loop():
     passive_gain = (skeleton_count * skeleton_power) + (zombie_count * zombie_power)
     gain_souls(passive_gain)
     update_ui()
+    print(get_available_upgrades(upgrades))
     root.after(tick_rate, game_loop)
 
 def update_ui():
@@ -97,16 +93,14 @@ def update_button_state(button, cost):
         button.config(state="disabled")
 
 def is_upgrade_unlocked(upgrade):
-    requirements_map = {
-    "click_count": click_count,
-    "skeleton_count": skeleton_count,
-    "zombie_count": zombie_count,
-    "total_souls_gained": total_souls_gained,
-    "tick_count": tick_count
-}
-    req_type = upgrade["requirement_type"]
-    req_value = upgrade["requirement_value"]
-    return requirements_map[req_type] >= req_value
+    return upgrade["requirement"]()
+
+def get_available_upgrades(upgrades):
+    available_upgrades = []
+    for upgrade in upgrades:
+        if is_upgrade_unlocked(upgrade) and upgrade["bought"] == False:
+            available_upgrades.append(upgrade)
+    return available_upgrades
 
 def gain_souls(amount):
     global souls, total_souls_gained
