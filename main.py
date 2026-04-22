@@ -12,10 +12,10 @@ click_count = 0
 click_power = 0.1
 skeleton_count = 0
 skeleton_cost = 1
-skeleton_power = 0.1
+skeleton_power = 0.2
 zombie_count = 0
 zombie_cost = 10
-zombie_power = 0.5
+zombie_power = 1
 
 # Upgrades
 upgrades = [
@@ -66,6 +66,7 @@ upgrades = [
 }
 ]
 
+upgrade_buttons = {}
 
 # Functions
 def game_loop():
@@ -74,7 +75,6 @@ def game_loop():
     passive_gain = (skeleton_count * skeleton_power) + (zombie_count * zombie_power)
     gain_souls(passive_gain)
     update_ui()
-    print(get_available_upgrades(upgrades))
     root.after(tick_rate, game_loop)
 
 def update_ui():
@@ -85,6 +85,20 @@ def update_ui():
     buy_zombie_button.config(text=f"Buy Zombie (Cost: {zombie_cost})")
     update_button_state(buy_zombie_button, zombie_cost)
     update_button_state(buy_skeleton_button, skeleton_cost)
+    create_upgrade_buttons()
+
+def create_upgrade_buttons():
+    available_upgrades = get_available_upgrades()
+    for upgrade in available_upgrades:
+        upgrade_id = upgrade["id"]
+        name = upgrade["name"]
+        cost = upgrade["cost"]
+        if upgrade_id in upgrade_buttons:
+            update_button_state(upgrade_buttons[upgrade_id], cost)
+            continue
+        upgrade_buttons[upgrade_id] = tk.Button(root, text=f"{name} (Cost: {cost})", command=lambda current_upgrade = upgrade: buy_upgrade(current_upgrade), state="disabled")
+        upgrade_buttons[upgrade_id].pack()
+        update_button_state(upgrade_buttons[upgrade_id], cost)
 
 def update_button_state(button, cost):
     if souls >= cost:
@@ -95,13 +109,43 @@ def update_button_state(button, cost):
 def is_upgrade_unlocked(upgrade):
     return upgrade["requirement"]()
 
-def get_available_upgrades(upgrades):
+def get_available_upgrades():
+    global upgrades
     available_upgrades = []
     for upgrade in upgrades:
-        if is_upgrade_unlocked(upgrade) and upgrade["bought"] == False:
+        if is_upgrade_unlocked(upgrade) and not upgrade["bought"]:
             available_upgrades.append(upgrade)
     return available_upgrades
 
+def can_buy_upgrade(upgrade):
+    return is_upgrade_unlocked(upgrade) and souls >= upgrade["cost"] and not upgrade["bought"]
+
+def apply_upgrade_effect(upgrade):
+    global click_power, skeleton_power, zombie_power, souls_multiplier, tick_rate
+    if upgrade["effect_type"] == "click_power":
+        click_power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "skeleton_power":
+        skeleton_power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "zombie_power":
+        zombie_power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "souls_multiplier":
+        souls_multiplier *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "tick_rate":
+        tick_rate = int(tick_rate * upgrade["effect_value"])
+    else:
+        raise ValueError("Upgrade effect type not found")
+
+def buy_upgrade(upgrade):
+    if can_buy_upgrade(upgrade):
+        spend_souls(upgrade["cost"])
+        upgrade["bought"] = True
+        apply_upgrade_effect(upgrade)
+        upgrade_id = upgrade["id"]
+        if upgrade_id in upgrade_buttons:
+            upgrade_buttons[upgrade_id].destroy()
+            upgrade_buttons.pop(upgrade_id)
+        update_ui()
+    
 def gain_souls(amount):
     global souls, total_souls_gained
     souls = round(souls + (amount * souls_multiplier), 1)
@@ -123,7 +167,7 @@ def buy_skeleton():
     if souls >= skeleton_cost:
         spend_souls(skeleton_cost)
         skeleton_count += 1
-        skeleton_cost = math.ceil(skeleton_cost * 1.5)
+        skeleton_cost = math.ceil(skeleton_cost * 1.3)
         update_ui()
        
 def buy_zombie():
@@ -131,7 +175,7 @@ def buy_zombie():
     if souls >= zombie_cost:
         spend_souls(zombie_cost)
         zombie_count += 1
-        zombie_cost = math.ceil(zombie_cost * 1.5)
+        zombie_cost = math.ceil(zombie_cost * 1.3)
         update_ui()
 
 # UI
@@ -156,6 +200,10 @@ buy_skeleton_button.pack()
 
 buy_zombie_button = tk.Button(root, text="Buy Zombie (Cost: 10)", command=buy_zombie, state="disabled")
 buy_zombie_button.pack()
+
+for upgrade in upgrades:
+    id = upgrade["id"]
+    
 
 update_ui()
 game_loop()
