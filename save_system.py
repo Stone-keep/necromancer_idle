@@ -1,4 +1,6 @@
 import game_state
+import json
+from pathlib import Path
 
 def build_save_dictionary():
     save_dictionary = {"tick_rate": game_state.tick_rate,
@@ -51,3 +53,15 @@ def load_save_from_dictionary(save_dictionary):
             upgrade_current["bought"] = True
         else:
             upgrade_current["bought"] = False
+
+def save_to_json():
+    save_dictionary = build_save_dictionary()
+    with open("save.json", "w") as file:
+        json.dump(save_dictionary, file, indent=4)
+
+def load_from_json():
+    if Path("save.json").is_file():
+        with open("save.json", "r") as file:
+            save_dictionary = json.load(file)
+            load_save_from_dictionary(save_dictionary)
+            print("Save loaded!")

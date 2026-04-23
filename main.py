@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import game_state, game_logic
+import game_state, game_logic, save_system
 
 save_dictionary = {'tick_rate': 1000, 'tick_count': 150, 'souls': 68.2, 'souls_multiplier': 1, 'total_souls_gained': 1066.2, 'total_souls_spent': 998, 'click_count': 525, 'click_power': 1.0, 'skeleton_count': 12, 'skeleton_cost': 59, 'skeleton_power': 0.4, 'zombie_count': 10, 'zombie_cost': 150, 'zombie_power': 1.2, 'upgrades_status': {1: True, 2: True, 3: True, 4: False, 5: False}}
 
@@ -8,8 +8,8 @@ def game_loop():
     game_state.tick_count += 1
     passive_gain = game_logic.total_passive_gain()
     game_logic.gain_souls(passive_gain)
-    if game_state.tick_count == 10:
-        game_logic.load_save_from_dictionary(save_dictionary)
+    if game_state.tick_count == 80:
+        save_system.save_to_json()
     update_ui()
     root.after(game_state.tick_rate, game_loop)
 
@@ -126,7 +126,7 @@ click_power_stat.pack()
 total_clicks_stat = tk.Label(stats_tab, text="Total Clicks: 0", font=("Arial", 10))
 total_clicks_stat.pack()
 
-
+save_system.load_from_json()
 update_ui()
 game_loop()
 root.mainloop()
