@@ -2,14 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 import game_state, game_logic, save_system
 
-save_dictionary = {'tick_rate': 1000, 'tick_count': 150, 'souls': 68.2, 'souls_multiplier': 1, 'total_souls_gained': 1066.2, 'total_souls_spent': 998, 'click_count': 525, 'click_power': 1.0, 'skeleton_count': 12, 'skeleton_cost': 59, 'skeleton_power': 0.4, 'zombie_count': 10, 'zombie_cost': 150, 'zombie_power': 1.2, 'upgrades_status': {1: True, 2: True, 3: True, 4: False, 5: False}}
-
 def game_loop():
     game_state.tick_count += 1
     passive_gain = game_logic.total_passive_gain()
     game_logic.gain_souls(passive_gain)
-    if game_state.tick_count == 80:
-        save_system.save_to_json()
     update_ui()
     root.after(game_state.tick_rate, game_loop)
 
@@ -35,6 +31,16 @@ def update_ui():
     total_ticks_stat.config(text=f"Total Ticks: {game_state.tick_count}")
     click_power_stat.config(text=f"Click Power: {game_state.click_power:.1f}")
     total_clicks_stat.config(text=f"Total Clicks: {game_state.click_count}")
+
+def auto_save():
+    save_system.save_to_json()
+    root.after(60000, auto_save)
+
+def close_and_save():
+    save_system.save_to_json()
+    print("Game saved on exit!")
+    root.destroy()
+
 
 def create_upgrade_buttons():
     available_upgrades = game_logic.get_available_upgrades()
@@ -129,4 +135,6 @@ total_clicks_stat.pack()
 save_system.load_from_json()
 update_ui()
 game_loop()
+auto_save()
+root.protocol("WM_DELETE_WINDOW", close_and_save)
 root.mainloop()
