@@ -1,4 +1,4 @@
-# Game variables
+# Variables
 tick_rate = 1000
 tick_count = 0
 souls = 0
