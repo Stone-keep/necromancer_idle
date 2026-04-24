@@ -61,7 +61,7 @@ upgrades = [
     "name": "Upgrade #5",
     "cost": 1000,
     "bought": False,
-    "requirement": lambda: tick_count >= 200,
+    "requirement": lambda: tick_count >= 240,
     "effect_type": "tick_rate",
     "effect_value": 0.9,
     "description": "Increase the global Tick Rate (everything becomes faster)"
