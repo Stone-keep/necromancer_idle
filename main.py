@@ -13,15 +13,21 @@ def update_ui():
     # Game Status Labels
     souls_label.config(text=f"Souls: {game_state.souls:.1f}")
     souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-    skeletons_label.config(text=f"Skeletons: {game_state.skeleton.count} ({game_state.skeleton.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-    zombies_label.config(text=f"Zombies: {game_state.zombie.count} ({game_state.zombie.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
+    skeleton_count.config(text=f"{game_state.skeleton.count}")
+    skeleton_souls.config(text=f"({game_state.skeleton.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
+    
+    zombie_count.config(text=f"{game_state.zombie.count}")
+    zombie_souls.config(text=f"({game_state.zombie.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
 
-    # Buttons
+    # Undead
     buy_skeleton_button.config(text=f"Buy Skeleton (Cost: {game_state.skeleton.cost})")
-    buy_zombie_button.config(text=f"Buy Zombie (Cost: {game_state.zombie.cost})")
-    update_button_state(buy_zombie_button, game_state.zombie.cost)
+    skeleton_production.config(text=f"Each Skeleton produces {game_state.skeleton.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
     update_button_state(buy_skeleton_button, game_state.skeleton.cost)
-    create_upgrade_buttons()
+    buy_zombie_button.config(text=f"Buy Zombie (Cost: {game_state.zombie.cost})")
+    zombie_production.config(text=f"Each Zombie produces {game_state.zombie.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
+    update_button_state(buy_zombie_button, game_state.zombie.cost)
+    
+    
 
     # Stats Labels
     souls_gained_stat.config(text=f"Total Souls Gained: {game_state.total_souls_gained}")
@@ -31,6 +37,8 @@ def update_ui():
     total_ticks_stat.config(text=f"Total Ticks: {game_state.tick_count}")
     click_power_stat.config(text=f"Click Power: {game_state.click_power:.1f}")
     total_clicks_stat.config(text=f"Total Clicks: {game_state.click_count}")
+
+    create_upgrade_buttons()
 
 def auto_save():
     save_system.save_to_json()
@@ -83,23 +91,36 @@ root.title("Necromancer Idle")
 root.geometry("500x800")
 
 status_frame = tk.Frame(root)
-status_frame.pack()
+status_frame.pack(fill="x")
 
 # Main Game/Status Frame
-souls_label = tk.Label(status_frame, text="Souls: 0", font=("Arial", 16))
-souls_label.pack()
+status_frame.grid_columnconfigure(0, weight=1)
+status_frame.grid_columnconfigure(4, weight=1)
+
+souls_label = tk.Label(status_frame, text="Souls: 0", font=("Arial", 20, "bold"))
+souls_label.grid(row=0, column=1, columnspan=3)
 souls_passive = tk.Label(status_frame, text="(0/s)", font=("Arial", 16))
-souls_passive.pack()
-collect_button = tk.Button(status_frame, text="Collect Soul", command=handle_collect_click)
-collect_button.pack()
-skeletons_label = tk.Label(status_frame, text="Skeletons: 0", font=("Arial", 12))
-skeletons_label.pack(pady=20)
-zombies_label = tk.Label(status_frame, text="Zombies: 0", font=("Arial", 12))
-zombies_label.pack(pady=20)
+souls_passive.grid(row=1, column=1, columnspan=3)
+collect_button = tk.Button(status_frame, text="Collect Soul", font=("Arial", 14, "bold"), command=handle_collect_click)
+collect_button.grid(row=2, column=1, columnspan=3, ipadx=15, ipady=7, pady=25)
+
+skeleton_name = tk.Label(status_frame, text="Skeletons:", font=("Arial", 12, "bold"))
+skeleton_name.grid(row=4, column=1, sticky="w", padx=5)
+skeleton_count = tk.Label(status_frame, text="0", font=("Arial", 12))
+skeleton_count.grid(row=4, column=2, padx=5)
+skeleton_souls = tk.Label(status_frame, text="(0/s)", font=("Arial", 12))
+skeleton_souls.grid(row=4, column=3, sticky="e", padx=5)
+
+zombie_name = tk.Label(status_frame, text="Zombies:", font=("Arial", 12, "bold"))
+zombie_name.grid(row=5, column=1, sticky="w", padx=5)
+zombie_count = tk.Label(status_frame, text="0", font=("Arial", 12))
+zombie_count.grid(row=5, column=2, padx=5)
+zombie_souls = tk.Label(status_frame, text="(0/s)", font=("Arial", 12))
+zombie_souls.grid(row=5, column=3, sticky="e", padx=5)
 
 
 notebook = ttk.Notebook(root)
-notebook.pack()
+notebook.pack(fill="x")
 
 undead_tab = tk.Frame(notebook)
 upgrades_tab = tk.Frame(notebook)
@@ -110,11 +131,20 @@ notebook.add(upgrades_tab, text="Upgrades")
 notebook.add(stats_tab, text="Stats")
 
 
-# Buy Undead Buttons
+# Buy Undead Tab
+undead_tab.grid_columnconfigure(0, weight=1)
+undead_tab.grid_columnconfigure(2, weight=1)
+
 buy_skeleton_button = tk.Button(undead_tab, text="Buy Skeleton (Cost: 1)", command=handle_buy_skeleton, state="disabled")
-buy_skeleton_button.pack()
+buy_skeleton_button.grid(row=0, column=1)
+skeleton_production = tk.Label(undead_tab, text="Each Skeleton produces 0.2 Souls per second")
+skeleton_production.grid(row=1, column=1)
 buy_zombie_button = tk.Button(undead_tab, text="Buy Zombie (Cost: 10)", command=handle_buy_zombie, state="disabled")
-buy_zombie_button.pack()
+buy_zombie_button.grid(row=2, column=1, pady=(10, 0))
+zombie_production = tk.Label(undead_tab, text=f"Each Zombie produces 0.6 Souls per second")
+zombie_production.grid(row=3, column=1)
+
+upgrades_info = tk.Label(upgrades_tab, text="Hint: Upgrades are unlocked dynamically once certain conditions (number of undead or clicks, total souls generated, time passed etc.) are met. Buying an upgrade permanently unlocks the bonus.")
 
 # Stats
 souls_gained_stat = tk.Label(stats_tab, text="Total Souls Gained: 0", font=("Arial", 10))
