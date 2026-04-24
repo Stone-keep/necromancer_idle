@@ -13,14 +13,14 @@ def update_ui():
     # Game Status Labels
     souls_label.config(text=f"Souls: {game_state.souls:.1f}")
     souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-    skeletons_label.config(text=f"Skeletons: {game_state.skeleton_count} ({game_logic.undead_passive_gain(game_state.skeleton_count, game_state.skeleton_power) * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-    zombies_label.config(text=f"Zombies: {game_state.zombie_count} ({game_logic.undead_passive_gain(game_state.zombie_count, game_state.zombie_power) * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
+    skeletons_label.config(text=f"Skeletons: {game_state.skeleton.count} ({game_state.skeleton.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
+    zombies_label.config(text=f"Zombies: {game_state.zombie.count} ({game_state.zombie.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
 
     # Buttons
-    buy_skeleton_button.config(text=f"Buy Skeleton (Cost: {game_state.skeleton_cost})")
-    buy_zombie_button.config(text=f"Buy Zombie (Cost: {game_state.zombie_cost})")
-    update_button_state(buy_zombie_button, game_state.zombie_cost)
-    update_button_state(buy_skeleton_button, game_state.skeleton_cost)
+    buy_skeleton_button.config(text=f"Buy Skeleton (Cost: {game_state.skeleton.cost})")
+    buy_zombie_button.config(text=f"Buy Zombie (Cost: {game_state.zombie.cost})")
+    update_button_state(buy_zombie_button, game_state.zombie.cost)
+    update_button_state(buy_skeleton_button, game_state.skeleton.cost)
     create_upgrade_buttons()
 
     # Stats Labels
@@ -70,11 +70,11 @@ def handle_upgrade_button(upgrade):
     update_ui()
 
 def handle_buy_skeleton():
-    game_logic.buy_skeleton()
+    game_logic.buy_undead(game_state.skeleton)
     update_ui()
 
 def handle_buy_zombie():
-    game_logic.buy_zombie()
+    game_logic.buy_undead(game_state.zombie)
     update_ui()
 
 # UI

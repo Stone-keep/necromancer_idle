@@ -1,5 +1,4 @@
 import game_state
-import math
 
 def is_upgrade_unlocked(upgrade):
     return upgrade["requirement"]()
@@ -18,9 +17,9 @@ def apply_upgrade_effect(upgrade):
     if upgrade["effect_type"] == "click_power":
         game_state.click_power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "skeleton_power":
-        game_state.skeleton_power *= upgrade["effect_value"]
+        game_state.skeleton.power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "zombie_power":
-        game_state.zombie_power *= upgrade["effect_value"]
+        game_state.zombie.power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "souls_multiplier":
         game_state.souls_multiplier *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "tick_rate":
@@ -38,11 +37,8 @@ def buy_upgrade(upgrade):
             game_state.upgrade_buttons[upgrade_id].destroy()
             game_state.upgrade_buttons.pop(upgrade_id)
 
-def undead_passive_gain(undead_count, undead_power):
-    return undead_count * undead_power
-
 def total_passive_gain():
-    return undead_passive_gain(game_state.skeleton_count, game_state.skeleton_power) + undead_passive_gain(game_state.zombie_count, game_state.zombie_power)
+    return game_state.skeleton.passive_gain() + game_state.zombie.passive_gain()
     
 def gain_souls(amount):
     game_state.souls = round(game_state.souls + (amount * game_state.souls_multiplier), 1)
@@ -56,14 +52,7 @@ def collect_soul_click():
     game_state.click_count += 1
     gain_souls(game_state.click_power)
     
-def buy_skeleton():
-    if game_state.souls >= game_state.skeleton_cost:
-        spend_souls(game_state.skeleton_cost)
-        game_state.skeleton_count += 1
-        game_state.skeleton_cost = math.ceil(game_state.skeleton_cost * 1.3)
-       
-def buy_zombie():
-    if game_state.souls >= game_state.zombie_cost:
-        spend_souls(game_state.zombie_cost)
-        game_state.zombie_count += 1
-        game_state.zombie_cost = math.ceil(game_state.zombie_cost * 1.3)
+def buy_undead(undead):
+    if game_state.souls >= undead.cost:
+        spend_souls(undead.cost)
+        undead.buy()

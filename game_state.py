@@ -1,3 +1,5 @@
+from undead import Undead
+
 # Variables
 tick_rate = 1000
 tick_count = 0
@@ -7,12 +9,10 @@ total_souls_gained = 0
 total_souls_spent = 0
 click_count = 0
 click_power = 0.1
-skeleton_count = 0
-skeleton_cost = 1
-skeleton_power = 0.2
-zombie_count = 0
-zombie_cost = 10
-zombie_power = 0.6
+
+#Undead
+skeleton = Undead("Skeleton", 0, 1, 1.3, 0.2)
+zombie = Undead("Zombie", 0, 10, 1.3, 0.6)
 
 # Upgrades
 upgrades = [
@@ -30,7 +30,7 @@ upgrades = [
     "name": "Upgrade #2",
     "cost": 50,
     "bought": False,
-    "requirement": lambda: skeleton_count >= 10,
+    "requirement": lambda: skeleton.count >= 10,
     "effect_type": "skeleton_power",
     "effect_value": 2
 },
@@ -39,7 +39,7 @@ upgrades = [
     "name": "Upgrade #3",
     "cost": 300,
     "bought": False,
-    "requirement": lambda: zombie_count >= 10,
+    "requirement": lambda: zombie.count >= 10,
     "effect_type": "zombie_power",
     "effect_value": 2
 },
