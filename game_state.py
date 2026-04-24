@@ -68,4 +68,4 @@ upgrades = [
 }
 ]
 
-upgrade_buttons = {}
+upgrade_frames = {}

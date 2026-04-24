@@ -33,9 +33,9 @@ def buy_upgrade(upgrade):
         upgrade["bought"] = True
         apply_upgrade_effect(upgrade)
         upgrade_id = upgrade["id"]
-        if upgrade_id in game_state.upgrade_buttons:
-            game_state.upgrade_buttons[upgrade_id].destroy()
-            game_state.upgrade_buttons.pop(upgrade_id)
+        if upgrade_id in game_state.upgrade_frames:
+            game_state.upgrade_frames[upgrade_id]["frame"].destroy()
+            game_state.upgrade_frames.pop(upgrade_id)
 
 def total_passive_gain():
     return game_state.skeleton.passive_gain() + game_state.zombie.passive_gain()
