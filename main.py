@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import game_state, game_logic, save_system
+import game_state, game_logic, save_system, style
 
 def game_loop():
     game_state.tick_count += 1
@@ -10,26 +10,28 @@ def game_loop():
     root.after(game_state.tick_rate, game_loop)
 
 def update_ui():
-    # Game Status Labels
+    # Update Game Status Labels
     souls_label.config(text=f"Souls: {game_state.souls:.1f}")
     souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
     skeleton_count.config(text=f"{game_state.skeleton.count}")
     skeleton_souls.config(text=f"({game_state.skeleton.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-    
     zombie_count.config(text=f"{game_state.zombie.count}")
     zombie_souls.config(text=f"({game_state.zombie.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
+    wraith_count.config(text=f"{game_state.wraith.count}")
+    wraith_souls.config(text=f"({game_state.wraith.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
 
-    # Undead
-    buy_skeleton_button.config(text=f"Buy Skeleton (Cost: {game_state.skeleton.cost})")
-    skeleton_production.config(text=f"Each Skeleton produces {game_state.skeleton.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
-    update_button_state(buy_skeleton_button, game_state.skeleton.cost)
-    buy_zombie_button.config(text=f"Buy Zombie (Cost: {game_state.zombie.cost})")
-    zombie_production.config(text=f"Each Zombie produces {game_state.zombie.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
-    update_button_state(buy_zombie_button, game_state.zombie.cost)
+    # Update Undead Buttons/Labels
+    buy_skeleton_button.config(text=f"Buy {game_state.skeleton.name} (Cost: {game_state.skeleton.cost})")
+    skeleton_production.config(text=f"Each {game_state.skeleton.name} produces {game_state.skeleton.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
+    game_logic.update_button_state(buy_skeleton_button, game_state.skeleton.cost)
+    buy_zombie_button.config(text=f"Buy {game_state.zombie.name} (Cost: {game_state.zombie.cost})")
+    zombie_production.config(text=f"Each {game_state.zombie.name} produces {game_state.zombie.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
+    game_logic.update_button_state(buy_zombie_button, game_state.zombie.cost)
+    buy_wraith_button.config(text=f"Buy {game_state.wraith.name} (Cost: {game_state.wraith.cost})")
+    wraith_production.config(text=f"Each {game_state.wraith.name} produces {game_state.wraith.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f} Souls per second")
+    game_logic.update_button_state(buy_wraith_button, game_state.wraith.cost)
     
-    
-
-    # Stats Labels
+    # Update Stats Labels
     souls_gained_stat.config(text=f"{game_state.total_souls_gained}")
     souls_spent_stat.config(text=f"{game_state.total_souls_spent}")
     souls_multiplier_stat.config(text=f"{game_state.souls_multiplier:.1f}x")
@@ -38,6 +40,7 @@ def update_ui():
     click_power_stat.config(text=f"{game_state.click_power:.1f}")
     total_clicks_stat.config(text=f"{game_state.click_count}")
 
+    # Update Available Upgrades
     create_upgrade_frames()
 
 def auto_save():
@@ -48,37 +51,6 @@ def close_and_save():
     save_system.save_to_json()
     print("Game saved on exit!")
     root.destroy()
-
-
-def create_upgrade_frames():
-    available_upgrades = game_logic.get_available_upgrades()
-    for upgrade in available_upgrades:
-        upgrade_id = upgrade["id"]
-        name = upgrade["name"]
-        cost = upgrade["cost"]
-        description = upgrade["description"]
-        if upgrade_id in game_state.upgrade_frames:
-            update_button_state(game_state.upgrade_frames[upgrade_id]["button"], cost)
-            continue
-        frame = tk.Frame(upgrades_tab, bg="black")
-        button = tk.Button(frame, text=f"{name} (Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **shop_button_style)
-        label = tk.Label(frame, text=f"{description}", bg="black", fg="white")
-        game_state.upgrade_frames[upgrade_id] = {
-            "frame": frame,
-            "button": button,
-            "label": label
-        }
-        
-        frame.pack(pady=(0, 10))
-        button.pack()
-        label.pack()
-        update_button_state(button, cost)
-
-def update_button_state(button, cost):
-    if game_state.souls >= cost:
-        button.config(state="normal")
-    else:
-        button.config(state="disabled")
 
 def handle_collect_click():
     game_logic.collect_soul_click()
@@ -96,71 +68,52 @@ def handle_buy_zombie():
     game_logic.buy_undead(game_state.zombie)
     update_ui()
 
+def handle_buy_wraith():
+    game_logic.buy_undead(game_state.wraith)
+    update_ui()
+
 # UI
 root = tk.Tk()
 root.title("Necromancer Idle")
 root.geometry("500x800")
 root.resizable(False, False)
-root.configure(bg="black")
-
-soul_color = "#9fe8d8"
-button_background = "#1a1a1a"
-button_active = "#25443d"
-
-collect_button_style = {
-    "bg": button_background,
-    "fg": soul_color,
-    "activebackground": button_active,
-    "activeforeground": "white",
-    "relief": "ridge",
-    "bd": 2,
-    "font": ("Arial", 14, "bold"),
-    "padx": 10,
-    "pady": 6
-}
-
-shop_button_style = {
-    "bg": button_background,
-    "fg": "#e6fff8",
-    "activebackground": button_active,
-    "activeforeground": "white",
-    "relief": "ridge",
-    "bd": 2,
-    "font": ("Arial", 9, "bold"),
-    "padx": 6,
-    "pady": 3
-}
+root.configure(bg=style.background_color)
 
 status_frame = tk.Frame(root)
 status_frame.pack(fill="x")
-status_frame.configure(bg="black")
+status_frame.configure(bg=style.background_color)
 
 # Main Game/Status Frame
 status_frame.grid_columnconfigure(0, weight=1)
 status_frame.grid_columnconfigure(4, weight=1)
 
-
-
-souls_label = tk.Label(status_frame, text="Souls: 0", font=("Arial", 20, "bold"), bg="black", fg=soul_color)
+souls_label = tk.Label(status_frame, text="Souls: 0", font=style.souls_font, bg=style.background_color, fg=style.soul_color)
 souls_label.grid(row=0, column=1, columnspan=3)
-souls_passive = tk.Label(status_frame, text="(0/s)", font=("Arial", 16), bg="black", fg="white")
+souls_passive = tk.Label(status_frame, text="(0/s)", font=style.souls_passive_font, bg=style.background_color, fg=style.text_color)
 souls_passive.grid(row=1, column=1, columnspan=3)
-collect_button = tk.Button(status_frame, text="Gather Soul", **collect_button_style, command=handle_collect_click)
+collect_button = tk.Button(status_frame, text="Gather Soul", **style.collect_button_style, command=handle_collect_click)
 collect_button.grid(row=2, column=1, columnspan=3, ipadx=15, ipady=7, pady=25)
 
-skeleton_name = tk.Label(status_frame, text="Skeletons:", font=("Arial", 12, "bold"), bg="black", fg="white")
+skeleton_name = tk.Label(status_frame, text="Skeletons:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
 skeleton_name.grid(row=4, column=1, sticky="w", padx=5)
-skeleton_count = tk.Label(status_frame, text="0", font=("Arial", 12), bg="black", fg="white")
+skeleton_count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
 skeleton_count.grid(row=4, column=2, padx=5)
-skeleton_souls = tk.Label(status_frame, text="(0/s)", font=("Arial", 12), bg="black", fg="white")
+skeleton_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
 skeleton_souls.grid(row=4, column=3, sticky="e", padx=5)
 
-zombie_name = tk.Label(status_frame, text="Zombies:", font=("Arial", 12, "bold"), bg="black", fg="white")
+zombie_name = tk.Label(status_frame, text="Zombies:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
 zombie_name.grid(row=5, column=1, sticky="w", padx=5)
-zombie_count = tk.Label(status_frame, text="0", font=("Arial", 12), bg="black", fg="white")
+zombie_count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
 zombie_count.grid(row=5, column=2, padx=5)
-zombie_souls = tk.Label(status_frame, text="(0/s)", font=("Arial", 12), bg="black", fg="white")
+zombie_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
 zombie_souls.grid(row=5, column=3, sticky="e", padx=5)
+
+wraith_name = tk.Label(status_frame, text="Wraiths:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
+wraith_name.grid(row=6, column=1, sticky="w", padx=5)
+wraith_count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
+wraith_count.grid(row=6, column=2, padx=5)
+wraith_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
+wraith_souls.grid(row=6, column=3, sticky="e", padx=5)
 
 
 notebook_style = ttk.Style()
@@ -168,7 +121,7 @@ notebook_style.theme_use("default")
 
 notebook_style.configure(
     "TNotebook",
-    background="black",
+    background=style.background_color,
     borderwidth=0
 )
 
@@ -177,7 +130,7 @@ notebook_style.configure(
     background="#1a1a1a",
     foreground="#e6fff8",
     padding=(10, 5),
-    font=("Arial", 9, "bold")
+    font=("Georgia", 10, "bold")
 )
 
 notebook_style.map(
@@ -189,9 +142,9 @@ notebook_style.map(
 notebook = ttk.Notebook(root)
 notebook.pack(fill="x")
 
-undead_tab = tk.Frame(notebook, bg="black")
-upgrades_tab = tk.Frame(notebook, bg="black")
-stats_tab = tk.Frame(notebook, bg="black")
+undead_tab = tk.Frame(notebook, bg=style.background_color)
+upgrades_tab = tk.Frame(notebook, bg=style.background_color)
+stats_tab = tk.Frame(notebook, bg=style.background_color)
 
 notebook.add(undead_tab, text="Undead")
 notebook.add(upgrades_tab, text="Upgrades")
@@ -199,54 +152,89 @@ notebook.add(stats_tab, text="Stats")
 
 
 # Buy Undead Tab
-undead_tab.grid_columnconfigure(0, weight=1)
-undead_tab.grid_columnconfigure(2, weight=1)
+undead_content = tk.Frame(undead_tab, bg=style.background_color)
+undead_content.pack(pady=(10, 0))
+undead_content.grid_columnconfigure(0, weight=1)
+undead_content.grid_columnconfigure(2, weight=1)
 
-buy_skeleton_button = tk.Button(undead_tab, text="Buy Skeleton (Cost: 1)", command=handle_buy_skeleton, state="disabled", **shop_button_style)
+buy_skeleton_button = tk.Button(undead_content, text=f"Buy {game_state.skeleton.name} (Cost: {game_state.skeleton.cost})", command=handle_buy_skeleton, state="disabled", **style.shop_button_style)
 buy_skeleton_button.grid(row=0, column=1)
-skeleton_production = tk.Label(undead_tab, text="Each Skeleton produces 0.2 Souls per second", bg="black", fg="white")
+skeleton_production = tk.Label(undead_content, text=f"Each {game_state.skeleton.name} produces {game_state.skeleton.power} Souls per second", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 skeleton_production.grid(row=1, column=1)
-buy_zombie_button = tk.Button(undead_tab, text="Buy Zombie (Cost: 10)", command=handle_buy_zombie, state="disabled", **shop_button_style)
+buy_zombie_button = tk.Button(undead_content, text=f"Buy {game_state.zombie.name} (Cost: {game_state.zombie.cost})", command=handle_buy_zombie, state="disabled", **style.shop_button_style)
 buy_zombie_button.grid(row=2, column=1, pady=(10, 0))
-zombie_production = tk.Label(undead_tab, text="Each Zombie produces 0.6 Souls per second", bg="black", fg="white")
+zombie_production = tk.Label(undead_content, text=f"Each {game_state.zombie.name} produces {game_state.zombie.power} Souls per second", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 zombie_production.grid(row=3, column=1)
+buy_wraith_button = tk.Button(undead_content, text=f"Buy {game_state.wraith.name} (Cost: {game_state.wraith.cost})", command=handle_buy_wraith, state="disabled", **style.shop_button_style)
+buy_wraith_button.grid(row=4, column=1, pady=(10, 0))
+wraith_production = tk.Label(undead_content, text=f"Each {game_state.wraith.name} produces {game_state.wraith.power} Souls per second", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+wraith_production.grid(row=5, column=1)
 
-upgrades_info = tk.Label(upgrades_tab, text="Hint: Upgrades are unlocked dynamically once certain conditions (number of undead or clicks, total souls generated, time passed etc.) are met. Buying an upgrade permanently unlocks the bonus.")
+# Upgrades Tab
+
+upgrades_content = tk.Frame(upgrades_tab, bg=style.background_color)
+upgrades_content.pack(pady=(10, 0))
+
+def create_upgrade_frames():
+    available_upgrades = game_logic.get_available_upgrades()
+    for upgrade in available_upgrades:
+        upgrade_id = upgrade["id"]
+        name = upgrade["name"]
+        cost = upgrade["cost"]
+        description = upgrade["description"]
+        if upgrade_id in game_state.upgrade_frames:
+            game_logic.update_button_state(game_state.upgrade_frames[upgrade_id]["button"], cost)
+            continue
+        frame = tk.Frame(upgrades_content, bg=style.background_color)
+        button = tk.Button(frame, text=f"{name} (Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
+        label = tk.Label(frame, text=f"{description}", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+        game_state.upgrade_frames[upgrade_id] = {
+            "frame": frame,
+            "button": button,
+            "label": label
+        }
+        
+        frame.pack(pady=(0, 10))
+        button.pack()
+        label.pack()
+        game_logic.update_button_state(button, cost)
 
 # Stats
-stats_tab.grid_columnconfigure(0, weight=1)
-stats_tab.grid_columnconfigure(3, weight=1)
+stats_content = tk.Frame(stats_tab, bg=style.background_color)
+stats_content.pack(pady=(10, 0))
+stats_content.grid_columnconfigure(0, weight=1)
+stats_content.grid_columnconfigure(3, weight=1)
 
-stats_label_font = ("Arial", 10, "bold")
-stats_dynamic_font = ("Arial", 10)
+for row in range(7):
+    stats_content.grid_rowconfigure(row, pad=4)
 
-souls_gained_label = tk.Label(stats_tab, text="Total Souls Gained:", font=stats_label_font, bg="black", fg="white")
-souls_gained_label.grid(row=0, column=1, sticky="w")
-souls_gained_stat = tk.Label(stats_tab, text="0", font=stats_dynamic_font, bg="black", fg="white")
-souls_gained_stat.grid(row=0, column=2, sticky="e")
-souls_spent_label = tk.Label(stats_tab, text="Total Souls Spent:", font=stats_label_font, bg="black", fg="white")
+souls_gained_label = tk.Label(stats_content, text="Total Souls Gained:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
+souls_gained_label.grid(row=0, column=1, sticky="w", padx=(0, 35))
+souls_gained_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+souls_gained_stat.grid(row=0, column=2, sticky="e", padx=(35, 0))
+souls_spent_label = tk.Label(stats_content, text="Total Souls Spent:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 souls_spent_label.grid(row=1, column=1, sticky="w")
-souls_spent_stat = tk.Label(stats_tab, text="0", font=stats_dynamic_font, bg="black", fg="white")
+souls_spent_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 souls_spent_stat.grid(row=1, column=2, sticky="e")
-souls_multiplier_label = tk.Label(stats_tab, text="Souls Multiplier:", font=stats_label_font, bg="black", fg="white")
+souls_multiplier_label = tk.Label(stats_content, text="Souls Multiplier:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 souls_multiplier_label.grid(row=2, column=1, sticky="w")
-souls_multiplier_stat = tk.Label(stats_tab, text="1x", font=stats_dynamic_font, bg="black", fg="white")
+souls_multiplier_stat = tk.Label(stats_content, text="1x", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 souls_multiplier_stat.grid(row=2, column=2, sticky="e")
-tick_rate_label = tk.Label(stats_tab, text="Tick Rate:", font=stats_label_font, bg="black", fg="white")
+tick_rate_label = tk.Label(stats_content, text="Tick Rate:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 tick_rate_label.grid(row=3, column=1, sticky="w")
-tick_rate_stat = tk.Label(stats_tab, text="1000ms", font=stats_dynamic_font, bg="black", fg="white")
+tick_rate_stat = tk.Label(stats_content, text="1000ms", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 tick_rate_stat.grid(row=3, column=2, sticky="e")
-total_ticks_label = tk.Label(stats_tab, text="Total Ticks:", font=stats_label_font, bg="black", fg="white")
+total_ticks_label = tk.Label(stats_content, text="Total Ticks:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 total_ticks_label.grid(row=4, column=1, sticky="w")
-total_ticks_stat = tk.Label(stats_tab, text="0", font=stats_dynamic_font, bg="black", fg="white")
+total_ticks_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 total_ticks_stat.grid(row=4, column=2, sticky="e")
-click_power_label = tk.Label(stats_tab, text="Click Power:", font=stats_label_font, bg="black", fg="white")
+click_power_label = tk.Label(stats_content, text="Click Power:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 click_power_label.grid(row=5, column=1, sticky="w")
-click_power_stat = tk.Label(stats_tab, text="0.1", font=stats_dynamic_font, bg="black", fg="white")
+click_power_stat = tk.Label(stats_content, text="0.1", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 click_power_stat.grid(row=5, column=2, sticky="e")
-total_clicks_label = tk.Label(stats_tab, text="Total Clicks:", font=stats_label_font, bg="black", fg="white")
+total_clicks_label = tk.Label(stats_content, text="Total Clicks:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 total_clicks_label.grid(row=6, column=1, sticky="w")
-total_clicks_stat = tk.Label(stats_tab, text="0", font=stats_dynamic_font, bg="black", fg="white")
+total_clicks_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 total_clicks_stat.grid(row=6, column=2, sticky="e")
 
 save_system.load_from_json()

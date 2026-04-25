@@ -38,7 +38,7 @@ def buy_upgrade(upgrade):
             game_state.upgrade_frames.pop(upgrade_id)
 
 def total_passive_gain():
-    return game_state.skeleton.passive_gain() + game_state.zombie.passive_gain()
+    return game_state.skeleton.passive_gain() + game_state.zombie.passive_gain() + game_state.wraith.passive_gain()
     
 def gain_souls(amount):
     game_state.souls = round(game_state.souls + (amount * game_state.souls_multiplier), 1)
@@ -56,3 +56,9 @@ def buy_undead(undead):
     if game_state.souls >= undead.cost:
         spend_souls(undead.cost)
         undead.buy()
+
+def update_button_state(button, cost):
+    if game_state.souls >= cost:
+        button.config(state="normal")
+    else:
+        button.config(state="disabled")

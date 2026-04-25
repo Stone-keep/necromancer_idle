@@ -13,6 +13,7 @@ click_power = 0.1
 #Undead
 skeleton = Undead("Skeleton", 0, 1, 1.3, 0.2)
 zombie = Undead("Zombie", 0, 10, 1.3, 0.6)
+wraith = Undead("Wraith", 0, 1000, 1.3, 10)
 
 # Upgrades
 upgrades = [
@@ -23,8 +24,8 @@ upgrades = [
     "bought": False,
     "requirement": lambda: click_count >= 100,
     "effect_type": "click_power",
-    "effect_value": 10,
-    "description": "Gathering Souls (Clicks) become 10x more powerful"
+    "effect_value": 5,
+    "description": "Gathering Souls (Clicking) becomes 5x more powerful"
 },
 {
     "id": 2,
@@ -54,7 +55,7 @@ upgrades = [
     "requirement": lambda: total_souls_gained >= 1000,
     "effect_type": "souls_multiplier",
     "effect_value": 1.2,
-    "description": "Increase the Souls production from all sources by 20%"
+    "description": "Increase the Souls production from all sources by 1.2x"
 },
 {
     "id": 5,
@@ -65,7 +66,8 @@ upgrades = [
     "effect_type": "tick_rate",
     "effect_value": 0.9,
     "description": "Increase the global Tick Rate (everything becomes faster)"
-}
+},
+
 ]
 
 upgrade_frames = {}

@@ -23,7 +23,13 @@ def build_save_dictionary():
                                "cost": game_state.zombie.cost,
                                "cost_multiplier": game_state.zombie.cost_multiplier,
                                "power": game_state.zombie.power
-                       }    
+                       },
+                            "wraith": {
+                               "count": game_state.wraith.count,
+                               "cost": game_state.wraith.cost,
+                               "cost_multiplier": game_state.wraith.cost_multiplier,
+                               "power": game_state.wraith.power
+                       }
                        },
                        "upgrades_status": {
                            
@@ -40,6 +46,7 @@ def load_save_from_dictionary(save_dictionary):
     undead = save_dictionary["undead"]
     skeleton = undead["skeleton"]
     zombie = undead["zombie"]
+    wraith = undead["wraith"]
     #Loading Global Variables
     game_state.tick_rate = int(save_dictionary["tick_rate"])
     game_state.tick_count = int(save_dictionary["tick_count"])
@@ -58,6 +65,10 @@ def load_save_from_dictionary(save_dictionary):
     game_state.zombie.cost = int(zombie["cost"])
     game_state.zombie.cost_multiplier = float(zombie["cost_multiplier"])
     game_state.zombie.power = float(zombie["power"])
+    game_state.wraith.count = int(wraith["count"])
+    game_state.wraith.cost = int(wraith["cost"])
+    game_state.wraith.cost_multiplier = float(wraith["cost_multiplier"])
+    game_state.wraith.power = float(wraith["power"])
 
     upgrades_saved = save_dictionary["upgrades_status"]
     for saved in upgrades_saved:
@@ -83,4 +94,4 @@ def load_from_json():
         except Exception as e:
             print(f"Save loading failed: {e}")
             print("Values after failure won't load.")
-            print("If changed values in the save file, make sure to leave variable names intact!")
+            print("If you changed values in the save file, make sure to leave variable names and dictionary syntax intact!")
