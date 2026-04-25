@@ -24,6 +24,14 @@ def apply_upgrade_effect(upgrade):
         game_state.souls_multiplier *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "tick_rate":
         game_state.tick_rate = int(game_state.tick_rate * upgrade["effect_value"])
+    elif upgrade["effect_type"] == "skeleton_cost_multiplier":
+        game_state.skeleton.cost_multiplier = float(upgrade["effect_value"])
+        game_state.skeleton.recalculate_cost()
+    elif upgrade["effect_type"] == "zombie_cost_multiplier":
+        game_state.zombie.cost_multiplier = float(upgrade["effect_value"])
+        game_state.zombie.recalculate_cost()
+    elif upgrade["effect_type"] == "skeleton_multiplier":
+        game_state.skeleton.global_multiplier += float(upgrade["effect_value"])
     else:
         raise ValueError("Upgrade effect type not found")
 
@@ -37,8 +45,11 @@ def buy_upgrade(upgrade):
             game_state.upgrade_frames[upgrade_id]["frame"].destroy()
             game_state.upgrade_frames.pop(upgrade_id)
 
+def undead_global_multiplier(undead):
+    return 1 + (undead.count * undead.global_multiplier)
+
 def total_passive_gain():
-    return game_state.skeleton.passive_gain() + game_state.zombie.passive_gain() + game_state.wraith.passive_gain()
+    return (game_state.skeleton.passive_gain() + game_state.zombie.passive_gain() + game_state.wraith.passive_gain()) * undead_global_multiplier(game_state.skeleton)
     
 def gain_souls(amount):
     game_state.souls = round(game_state.souls + (amount * game_state.souls_multiplier), 1)
@@ -62,3 +73,9 @@ def update_button_state(button, cost):
         button.config(state="normal")
     else:
         button.config(state="disabled")
+
+def undead_status_production(undead):
+    return f"{undead.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier(game_state.skeleton):.1f}/s"
+
+def undead_button_production(undead):
+    return f"Each {undead.name} produces {undead.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier(game_state.skeleton):.1f} Souls per second"

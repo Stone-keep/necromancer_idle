@@ -16,19 +16,22 @@ def build_save_dictionary():
                                "count": game_state.skeleton.count,
                                "cost": game_state.skeleton.cost,
                                "cost_multiplier": game_state.skeleton.cost_multiplier,
-                               "power": game_state.skeleton.power
+                               "power": game_state.skeleton.power,
+                               "global_multiplier": game_state.skeleton.global_multiplier
                        },
                            "zombie": {
                                "count": game_state.zombie.count,
                                "cost": game_state.zombie.cost,
                                "cost_multiplier": game_state.zombie.cost_multiplier,
-                               "power": game_state.zombie.power
+                               "power": game_state.zombie.power,
+                               "global_multiplier": game_state.zombie.global_multiplier
                        },
                             "wraith": {
                                "count": game_state.wraith.count,
                                "cost": game_state.wraith.cost,
                                "cost_multiplier": game_state.wraith.cost_multiplier,
-                               "power": game_state.wraith.power
+                               "power": game_state.wraith.power,
+                               "global_multiplier": game_state.wraith.global_multiplier
                        }
                        },
                        "upgrades_status": {
@@ -61,14 +64,19 @@ def load_save_from_dictionary(save_dictionary):
     game_state.skeleton.cost = int(skeleton["cost"])
     game_state.skeleton.cost_multiplier = float(skeleton["cost_multiplier"])
     game_state.skeleton.power = float(skeleton["power"])
+    game_state.skeleton.global_multiplier = float(skeleton["global_multiplier"])
+
     game_state.zombie.count = int(zombie["count"])
     game_state.zombie.cost = int(zombie["cost"])
     game_state.zombie.cost_multiplier = float(zombie["cost_multiplier"])
     game_state.zombie.power = float(zombie["power"])
+    game_state.zombie.global_multiplier = float(zombie["global_multiplier"])
+
     game_state.wraith.count = int(wraith["count"])
     game_state.wraith.cost = int(wraith["cost"])
     game_state.wraith.cost_multiplier = float(wraith["cost_multiplier"])
     game_state.wraith.power = float(wraith["power"])
+    game_state.wraith.global_multiplier = float(wraith["global_multiplier"])
 
     upgrades_saved = save_dictionary["upgrades_status"]
     for saved in upgrades_saved:
