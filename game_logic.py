@@ -20,6 +20,8 @@ def apply_upgrade_effect(upgrade):
         game_state.skeleton.power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "zombie_power":
         game_state.zombie.power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "wraith_power":
+        game_state.wraith.power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "souls_multiplier":
         game_state.souls_multiplier *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "tick_rate":

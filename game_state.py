@@ -50,12 +50,12 @@ upgrades = [
 {
     "id": 4,
     "name": "Upgrade #4",
-    "cost": 300,
+    "cost": 250,
     "bought": False,
-    "requirement": lambda: click_count >= 200,
+    "requirement": lambda: click_count >= 250,
     "effect_type": "click_power",
-    "effect_value": 5,
-    "description": "Gathering Souls (Clicking) becomes 5x more powerful"
+    "effect_value": 10,
+    "description": "Gathering Souls (Clicking) becomes 10x more powerful"
 },
 {
     "id": 5,
@@ -70,16 +70,6 @@ upgrades = [
 {
     "id": 6,
     "name": "Upgrade #6",
-    "cost": 666,
-    "bought": False,
-    "requirement": lambda: click_count >= 666,
-    "effect_type": "click_power",
-    "effect_value": 6.66,
-    "description": "Gathering Souls (Clicking) becomes 6.66x more powerful"
-},
-{
-    "id": 7,
-    "name": "Upgrade #7",
     "cost": 1000,
     "bought": False,
     "requirement": lambda: tick_count >= 240,
@@ -88,8 +78,8 @@ upgrades = [
     "description": "Increase the global Tick Rate (everything becomes faster)"
 },
 {
-    "id": 8,
-    "name": "Upgrade #8",
+    "id": 7,
+    "name": "Upgrade #7",
     "cost": 2000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 20,
@@ -98,8 +88,8 @@ upgrades = [
     "description": "Reduces the cost multiplier of Skeletons to 1.2x (retroactive!)"
 },
 {
-    "id": 9,
-    "name": "Upgrade #9",
+    "id": 8,
+    "name": "Upgrade #8",
     "cost": 3000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 30,
@@ -108,14 +98,24 @@ upgrades = [
     "description": "Triple the Souls production of Skeletons"
 },
 {
-    "id": 10,
-    "name": "Upgrade #10",
+    "id": 9,
+    "name": "Upgrade #9",
     "cost": 4000,
     "bought": False,
     "requirement": lambda: zombie.count >= 20,
     "effect_type": "zombie_cost_multiplier",
     "effect_value": 1.2,
     "description": "Reduces the cost multiplier of Zombies to 1.2x (retroactive!)"
+},
+{
+    "id": 10,
+    "name": "Upgrade #10",
+    "cost": 6666,
+    "bought": False,
+    "requirement": lambda: click_count >= 1000,
+    "effect_type": "click_power",
+    "effect_value": 6.66,
+    "description": "Gathering Souls (Clicking) becomes 6.66x more powerful"
 },
 {
     "id": 11,

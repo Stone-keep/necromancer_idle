@@ -3,6 +3,7 @@ soul_color = "#9fe8d8"
 text_color = "#e6fff8"
 button_background = "#1a1a1a"
 button_active_background = "#25443d"
+notification_color = "#7CFF7C"
 souls_font = ("Cambria", 22, "bold")
 souls_passive_font = ("Cambria", 18)
 collect_button_font = ("Cambria", 16, "bold")
@@ -11,6 +12,7 @@ undead_label_font = ("Cambria", 14, "bold")
 undead_stats_font = ("Cambria", 14)
 stats_label_font = ("Cambria", 12, "bold")
 stats_dynamic_font = ("Cambria", 12)
+notification_font = ("Cambria", 12, "bold")
 
 collect_button_style = {
     "bg": button_background,

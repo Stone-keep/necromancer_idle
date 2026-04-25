@@ -115,6 +115,27 @@ wraith_count.grid(row=6, column=2, padx=5)
 wraith_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
 wraith_souls.grid(row=6, column=3, sticky="e", padx=5)
 
+# Notification
+
+notification_frame = tk.Frame(root)
+notification_frame.pack(fill="x", pady=(20, 10))
+notification_frame.configure(bg=style.background_color)
+
+notification_label = tk.Label(notification_frame, text="", font=style.notification_font, bg=style.background_color, fg=style.notification_color)
+notification_label.pack()
+
+notification_status = False
+
+def create_notification(message):
+    global notification_status
+    root.after(5000, clear_notification)
+    notification_label.config(text=message, fg=style.notification_color)
+    notification_status = True
+
+def clear_notification():
+    global notification_status
+    notification_status = False
+    notification_label.config(text="")
 
 notebook_style = ttk.Style()
 notebook_style.theme_use("default")
@@ -197,7 +218,11 @@ def create_upgrade_frames():
         frame.pack(pady=(0, 10))
         button.pack()
         label.pack()
+        if notification_status is False:
+            create_notification(f"New Upgrade Available: {name}")
         game_logic.update_button_state(button, cost)
+        
+        
 
 # Stats
 stats_content = tk.Frame(stats_tab, bg=style.background_color)
