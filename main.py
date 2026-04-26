@@ -13,12 +13,10 @@ def update_ui():
     # Update Game Status Labels
     souls_label.config(text=f"Souls: {game_state.souls:.1f}")
     souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-    skeleton_count.config(text=f"{game_state.skeleton.count}")
-    skeleton_souls.config(text=game_logic.undead_status_production(game_state.skeleton))
-    zombie_count.config(text=f"{game_state.zombie.count}")
-    zombie_souls.config(text=game_logic.undead_status_production(game_state.zombie))
-    wraith_count.config(text=f"{game_state.wraith.count}")
-    wraith_souls.config(text=game_logic.undead_status_production(game_state.wraith))
+
+    # Create & Update Undead Status Labels
+    create_undead_status_widgets()
+    update_undead_status_widgets()
 
     # Update Undead Buttons/Labels
     buy_skeleton_button.config(text=f"Buy {game_state.skeleton.name} (Cost: {game_state.skeleton.cost})")
@@ -94,27 +92,38 @@ souls_passive.grid(row=1, column=1, columnspan=3)
 collect_button = tk.Button(status_frame, text="Gather Soul", **style.collect_button_style, command=handle_collect_click)
 collect_button.grid(row=2, column=1, columnspan=3, ipadx=15, ipady=7, pady=25)
 
-skeleton_name = tk.Label(status_frame, text="Skeletons:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
-skeleton_name.grid(row=4, column=1, sticky="w", padx=5)
-skeleton_count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-skeleton_count.grid(row=4, column=2, padx=5)
-skeleton_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-skeleton_souls.grid(row=4, column=3, sticky="e", padx=5)
+undead_status_widgets = {}
 
-zombie_name = tk.Label(status_frame, text="Zombies:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
-zombie_name.grid(row=5, column=1, sticky="w", padx=5)
-zombie_count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-zombie_count.grid(row=5, column=2, padx=5)
-zombie_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-zombie_souls.grid(row=5, column=3, sticky="e", padx=5)
+def create_undead_status_widgets():
+    new_undead_row = 3 + len(undead_status_widgets)
+    for undead in game_state.undead_list:
+        undead_name = undead.name
+        if undead_name in undead_status_widgets:
+            continue
+        if undead.unlocked:
+            name = tk.Label(status_frame, text=f"{undead_name}s:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
+            count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
+            souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
+            undead_status_widgets[undead_name] = {
+                "name": name,
+                "count": count,
+                "souls": souls
+            }
+            name.grid(row=new_undead_row, column=1, sticky="w", padx=5)
+            count.grid(row=new_undead_row, column=2, padx=5)
+            souls.grid(row=new_undead_row, column=3, sticky="e", padx=5)
+            new_undead_row += 1
 
-wraith_name = tk.Label(status_frame, text="Wraiths:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
-wraith_name.grid(row=6, column=1, sticky="w", padx=5)
-wraith_count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-wraith_count.grid(row=6, column=2, padx=5)
-wraith_souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-wraith_souls.grid(row=6, column=3, sticky="e", padx=5)
-
+def update_undead_status_widgets():
+    for undead in game_state.undead_list:
+        undead_name = undead.name
+        if undead_name not in undead_status_widgets:
+            continue
+        count = undead_status_widgets[undead_name]["count"]
+        souls = undead_status_widgets[undead_name]["souls"]
+        count.config(text=f"{undead.count}")
+        souls.config(text=f"{game_logic.undead_status_production(undead)}")
+        
 # Notification
 
 notification_frame = tk.Frame(root)
@@ -128,9 +137,10 @@ notification_status = False
 
 def create_notification(message):
     global notification_status
-    root.after(5000, clear_notification)
-    notification_label.config(text=message, fg=style.notification_color)
-    notification_status = True
+    if notification_status is False:
+        notification_label.config(text=message, fg=style.notification_color)
+        notification_status = True
+        root.after(5000, clear_notification)
 
 def clear_notification():
     global notification_status
@@ -218,12 +228,9 @@ def create_upgrade_frames():
         frame.pack(pady=(0, 10))
         button.pack()
         label.pack()
-        if notification_status is False:
-            create_notification(f"New Upgrade Available: {name}")
+        create_notification(f"New Upgrade Available: {name}")
         game_logic.update_button_state(button, cost)
         
-        
-
 # Stats
 stats_content = tk.Frame(stats_tab, bg=style.background_color)
 stats_content.pack(pady=(10, 0))

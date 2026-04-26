@@ -51,8 +51,8 @@ def undead_global_multiplier(undead):
     return 1 + (undead.count * undead.global_multiplier)
 
 def total_passive_gain():
-    return (game_state.skeleton.passive_gain() + game_state.zombie.passive_gain() + game_state.wraith.passive_gain()) * undead_global_multiplier(game_state.skeleton)
-    
+    return sum(undead.passive_gain() for undead in game_state.undead_list)
+
 def gain_souls(amount):
     game_state.souls = round(game_state.souls + (amount * game_state.souls_multiplier), 1)
     game_state.total_souls_gained = round(game_state.total_souls_gained + (amount * game_state.souls_multiplier), 1)

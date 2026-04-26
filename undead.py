@@ -1,7 +1,7 @@
 import math
 
 class Undead:
-    def __init__(self, name, count, cost, cost_multiplier, power):
+    def __init__(self, name, count, cost, cost_multiplier, power, unlocked):
         self.name = name
         self.count = count
         self.base_cost = cost
@@ -9,6 +9,7 @@ class Undead:
         self.cost_multiplier = cost_multiplier
         self.power = power
         self.global_multiplier = 0
+        self.unlocked = unlocked
 
     def passive_gain(self):
         return self.count * self.power

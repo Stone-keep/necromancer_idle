@@ -11,9 +11,11 @@ click_count = 0
 click_power = 0.1
 
 #Undead
-skeleton = Undead("Skeleton", 0, 1, 1.3, 0.2)
-zombie = Undead("Zombie", 0, 10, 1.3, 0.6)
-wraith = Undead("Wraith", 0, 1000, 1.3, 10)
+skeleton = Undead("Skeleton", 0, 1, 1.3, 0.2, True)
+zombie = Undead("Zombie", 0, 10, 1.3, 0.6, True)
+wraith = Undead("Wraith", 0, 1000, 1.3, 10, True)
+
+undead_list = [skeleton, zombie, wraith]
 
 # Upgrades
 upgrades = [
