@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import game_state, game_logic, save_system, style
 
+
 def game_loop():
     game_state.tick_count += 1
     passive_gain = game_logic.total_passive_gain()
@@ -119,19 +120,31 @@ notification_frame.configure(bg=style.background_color)
 notification_label = tk.Label(notification_frame, text="", font=style.notification_font, bg=style.background_color, fg=style.notification_color)
 notification_label.pack()
 
+notification_queue = []
 notification_status = False
 
 def create_notification(message):
+    notification_queue.append(message)
+    show_next_notification()
+    
+def show_next_notification():
     global notification_status
-    if notification_status is False:
-        notification_label.config(text=message, fg=style.notification_color)
-        notification_status = True
-        root.after(5000, clear_notification)
+    if len(notification_queue) == 0:
+        return
+    if notification_status is True:
+        return
+    message = notification_queue.pop(0)
+    notification_label.config(text=message, fg=style.notification_color)
+    notification_status = True
+    root.after(5000, clear_notification)
 
 def clear_notification():
     global notification_status
     notification_status = False
     notification_label.config(text="")
+    if len(notification_queue) > 0:
+        root.after(1000, show_next_notification)
+        
 
 notebook_style = ttk.Style()
 notebook_style.theme_use("default")
