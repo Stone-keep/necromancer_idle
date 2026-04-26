@@ -75,7 +75,10 @@ def load_from_json():
                 save_dictionary = json.load(file)
                 load_save_from_dictionary(save_dictionary)
                 print("Save loaded!")
+                return True
         except Exception as e:
             print(f"Save loading failed: {e}")
             print("Values after failure won't load.")
             print("If you changed values in the save file, make sure to leave variable names and dictionary syntax intact!")
+            return False
+    return False

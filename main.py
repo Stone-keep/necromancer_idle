@@ -82,7 +82,7 @@ souls_label = tk.Label(status_frame, text="Souls: 0", font=style.souls_font, bg=
 souls_label.grid(row=0, column=1, columnspan=3)
 souls_passive = tk.Label(status_frame, text="(0/s)", font=style.souls_passive_font, bg=style.background_color, fg=style.text_color)
 souls_passive.grid(row=1, column=1, columnspan=3)
-collect_button = tk.Button(status_frame, text="Gather Soul", **style.collect_button_style, command=handle_collect_click)
+collect_button = tk.Button(status_frame, text="Gather Souls", **style.collect_button_style, command=handle_collect_click)
 collect_button.grid(row=2, column=1, columnspan=3, ipadx=15, ipady=7, pady=25)
 
 undead_status_widgets = {}
@@ -187,11 +187,19 @@ notebook.pack(fill="x")
 undead_tab = tk.Frame(notebook, bg=style.background_color)
 upgrades_tab = tk.Frame(notebook, bg=style.background_color)
 stats_tab = tk.Frame(notebook, bg=style.background_color)
+info_tab = tk.Frame(notebook, bg=style.background_color)
 
 notebook.add(undead_tab, text="Undead")
 notebook.add(upgrades_tab, text="Upgrades")
 notebook.add(stats_tab, text="Stats")
+notebook.add(info_tab, text="Info")
 
+save_was_loaded = save_system.load_from_json()
+
+if save_was_loaded:
+    notebook.select(undead_tab)
+else:
+    notebook.select(info_tab)
 
 # Buy Undead Tab
 undead_content = tk.Frame(undead_tab, bg=style.background_color)
@@ -298,7 +306,23 @@ total_clicks_label.grid(row=6, column=1, sticky="w")
 total_clicks_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 total_clicks_stat.grid(row=6, column=2, sticky="e")
 
-save_system.load_from_json()
+# Info
+
+info_content = tk.Frame(info_tab, bg=style.background_color)
+info_content.pack(pady=(10, 0))
+
+info_text = """Welcome, aspiring necromancer. Your goal is to gather one billion souls to summon the Undead King and harness his power to rule the world.
+
+First you need to collect Souls manually (by clicking "Gather Souls" button). Use those Souls to raise Undead minions (you will unlock more as the game goes on). They will do your bidding, passively generating Souls... which you can spend to raise more of them, or buy permanent upgrades.
+
+New upgrades show up in "Upgrades" tab when certain conditions are met (such as raising 10 of a specific Undead, clicking X times or after a certain amount of time passes). You will get notified whenever a new upgrade is available.
+
+You can also view your progress in "Stats" tab.
+
+This is my first personal project created with Python/Tkinter. If you want to learn more, check out README.md. Enjoy!"""
+info_label = tk.Label(info_content, text=info_text, font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=480)
+info_label.pack()
+
 update_ui()
 game_loop()
 auto_save()
