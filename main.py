@@ -14,20 +14,14 @@ def update_ui():
     souls_label.config(text=f"Souls: {game_state.souls:.1f}")
     souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
 
-    # Create & Update Undead Status Labels
+    # Create & Update Undead Status
     create_undead_status_widgets()
     update_undead_status_widgets()
 
-    # Update Undead Buttons/Labels
-    buy_skeleton_button.config(text=f"Buy {game_state.skeleton.name} (Cost: {game_state.skeleton.cost})")
-    skeleton_production.config(text=game_logic.undead_button_production(game_state.skeleton))
-    game_logic.update_button_state(buy_skeleton_button, game_state.skeleton.cost)
-    buy_zombie_button.config(text=f"Buy {game_state.zombie.name} (Cost: {game_state.zombie.cost})")
-    zombie_production.config(text=game_logic.undead_button_production(game_state.zombie))
-    game_logic.update_button_state(buy_zombie_button, game_state.zombie.cost)
-    buy_wraith_button.config(text=f"Buy {game_state.wraith.name} (Cost: {game_state.wraith.cost})")
-    wraith_production.config(text=game_logic.undead_button_production(game_state.wraith))
-    game_logic.update_button_state(buy_wraith_button, game_state.wraith.cost)
+    # Create & Update Undead Buttons/Labels
+    
+    create_undead_buttons()
+    update_undead_buttons()
     
     # Update Stats Labels
     souls_gained_stat.config(text=f"{game_state.total_souls_gained}")
@@ -58,16 +52,8 @@ def handle_upgrade_button(upgrade):
     game_logic.buy_upgrade(upgrade)
     update_ui()
 
-def handle_buy_skeleton():
-    game_logic.buy_undead(game_state.skeleton)
-    update_ui()
-
-def handle_buy_zombie():
-    game_logic.buy_undead(game_state.zombie)
-    update_ui()
-
-def handle_buy_wraith():
-    game_logic.buy_undead(game_state.wraith)
+def handle_buy_undead(undead):
+    game_logic.buy_undead(undead)
     update_ui()
 
 # UI
@@ -188,18 +174,36 @@ undead_content.pack(pady=(10, 0))
 undead_content.grid_columnconfigure(0, weight=1)
 undead_content.grid_columnconfigure(2, weight=1)
 
-buy_skeleton_button = tk.Button(undead_content, text=f"Buy {game_state.skeleton.name} (Cost: {game_state.skeleton.cost})", command=handle_buy_skeleton, state="disabled", **style.shop_button_style)
-buy_skeleton_button.grid(row=0, column=1)
-skeleton_production = tk.Label(undead_content, text=f"Each {game_state.skeleton.name} produces {game_state.skeleton.power} Souls per second", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
-skeleton_production.grid(row=1, column=1)
-buy_zombie_button = tk.Button(undead_content, text=f"Buy {game_state.zombie.name} (Cost: {game_state.zombie.cost})", command=handle_buy_zombie, state="disabled", **style.shop_button_style)
-buy_zombie_button.grid(row=2, column=1, pady=(10, 0))
-zombie_production = tk.Label(undead_content, text=f"Each {game_state.zombie.name} produces {game_state.zombie.power} Souls per second", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
-zombie_production.grid(row=3, column=1)
-buy_wraith_button = tk.Button(undead_content, text=f"Buy {game_state.wraith.name} (Cost: {game_state.wraith.cost})", command=handle_buy_wraith, state="disabled", **style.shop_button_style)
-buy_wraith_button.grid(row=4, column=1, pady=(10, 0))
-wraith_production = tk.Label(undead_content, text=f"Each {game_state.wraith.name} produces {game_state.wraith.power} Souls per second", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
-wraith_production.grid(row=5, column=1)
+undead_buttons = {}
+
+def create_undead_buttons():
+    new_button_row = len(undead_buttons) * 2
+    for undead in game_state.undead_list:
+        name = undead.name
+        if name in undead_buttons:
+            continue
+        if undead.unlocked:
+            button = tk.Button(undead_content, text=f"Buy {undead.name} (Cost: {undead.cost})", command=lambda current_undead = undead: handle_buy_undead(current_undead), state="disabled", **style.shop_button_style)
+            label = tk.Label(undead_content, text=game_logic.undead_button_production(undead), font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+            undead_buttons[name] = {
+                "button": button,
+                "label": label
+            }
+            button.grid(row=new_button_row, column=1, pady=(10, 0))
+            label.grid(row=new_button_row+1, column=1)
+            new_button_row += 2
+
+def update_undead_buttons():
+    for undead in game_state.undead_list:
+        name = undead.name
+        if name not in undead_buttons:
+            continue
+        button = undead_buttons[name]["button"]
+        label = undead_buttons[name]["label"]
+        button.config(text=f"Buy {undead.name} (Cost: {undead.cost})")
+        label.config(text=game_logic.undead_button_production(undead))    
+        game_logic.update_button_state(button, undead.cost)
+
 
 # Upgrades Tab
 
