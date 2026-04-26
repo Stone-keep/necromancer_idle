@@ -1,8 +1,9 @@
 import math
 
 class Undead:
-    def __init__(self, name, count, cost, cost_multiplier, power, unlocked):
+    def __init__(self, name, name_plural, count, cost, cost_multiplier, power, unlocked):
         self.name = name
+        self.name_plural = name_plural
         self.count = count
         self.base_cost = cost
         self.cost = cost

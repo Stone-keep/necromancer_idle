@@ -7,6 +7,7 @@ def game_loop():
     game_state.tick_count += 1
     passive_gain = game_logic.total_passive_gain()
     game_logic.gain_souls(passive_gain)
+    unlock_undead()
     update_ui()
     root.after(game_state.tick_rate, game_loop)
 
@@ -57,6 +58,11 @@ def handle_buy_undead(undead):
     game_logic.buy_undead(undead)
     update_ui()
 
+def unlock_undead():
+    if game_state.vampire.unlocked is False and game_state.wraith.count >= 20:
+        game_state.vampire.unlocked = True
+        create_notification("New Undead Unlocked: Vampire")
+
 # UI
 root = tk.Tk()
 root.title("Necromancer Idle")
@@ -87,29 +93,35 @@ def create_undead_status_widgets():
         undead_name = undead.name
         if undead_name in undead_status_widgets:
             continue
-        if undead.unlocked:
-            name = tk.Label(status_frame, text=f"{undead_name}s:", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
-            count = tk.Label(status_frame, text="0", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-            souls = tk.Label(status_frame, text="(0/s)", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-            undead_status_widgets[undead_name] = {
-                "name": name,
-                "count": count,
-                "souls": souls
-            }
-            name.grid(row=new_undead_row, column=1, sticky="w", padx=5)
-            count.grid(row=new_undead_row, column=2, padx=5)
-            souls.grid(row=new_undead_row, column=3, sticky="e", padx=5)
-            new_undead_row += 1
+        name = tk.Label(status_frame, text="", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
+        count = tk.Label(status_frame, text="", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
+        souls = tk.Label(status_frame, text="", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
+        undead_status_widgets[undead_name] = {
+            "name": name,
+            "count": count,
+            "souls": souls
+        }
+        name.grid(row=new_undead_row, column=1, sticky="w", padx=5)
+        count.grid(row=new_undead_row, column=2, padx=5)
+        souls.grid(row=new_undead_row, column=3, sticky="e", padx=5)
+        new_undead_row += 1
 
 def update_undead_status_widgets():
     for undead in game_state.undead_list:
         undead_name = undead.name
         if undead_name not in undead_status_widgets:
             continue
+        name = undead_status_widgets[undead_name]["name"]
         count = undead_status_widgets[undead_name]["count"]
         souls = undead_status_widgets[undead_name]["souls"]
-        count.config(text=f"{undead.count}")
-        souls.config(text=f"{game_logic.undead_status_production(undead)}")
+        if undead.unlocked:
+            name.config(text=f"{undead.name_plural}:")
+            count.config(text=f"{undead.count}")
+            souls.config(text=f"{game_logic.undead_status_production(undead)}")
+        else:
+            name.config(text="")
+            count.config(text="")
+            souls.config(text="")
         
 # Notification
 
