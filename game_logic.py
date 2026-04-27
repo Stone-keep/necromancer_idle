@@ -65,8 +65,11 @@ def undead_global_multiplier():
         global_multiplier *= 1 + (undead.count * undead.global_multiplier)
     return global_multiplier
 
+def souls_for_ticks_multiplier():
+    return 1 + (game_state.tick_count // 10) * game_state.souls_tick_multiplier
+
 def total_passive_gain():
-    return sum(undead.passive_gain() for undead in game_state.undead_list) * undead_global_multiplier() * (1 + (game_state.tick_count // 10) * game_state.souls_tick_multiplier)
+    return sum(undead.passive_gain() for undead in game_state.undead_list) * undead_global_multiplier() * souls_for_ticks_multiplier()
 
 def gain_souls(amount):
     game_state.souls = round(game_state.souls + (amount * game_state.souls_multiplier), 1)
@@ -94,10 +97,10 @@ def update_button_state(button, cost):
         button.config(state="disabled")
 
 def undead_status_production(undead):
-    return f"{undead.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier():.1f}/s"
+    return f"{undead.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier() * souls_for_ticks_multiplier():.1f}/s"
 
 def undead_button_production(undead):
-    return f"Each {undead.name} produces {undead.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier():.1f} Souls per second"
+    return f"Each {undead.name} produces {undead.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier() * souls_for_ticks_multiplier():.1f} Souls per second"
 
 def true_cost_multiplier(undead):
     multiplier = undead.cost_multiplier
