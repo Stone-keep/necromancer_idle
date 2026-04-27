@@ -27,10 +27,10 @@ def apply_upgrade_effect(upgrade):
     elif upgrade["effect_type"] == "tick_rate":
         game_state.tick_rate = int(game_state.tick_rate * upgrade["effect_value"])
     elif upgrade["effect_type"] == "skeleton_cost_multiplier":
-        game_state.skeleton.cost_multiplier = float(upgrade["effect_value"])
+        game_state.skeleton.cost_multiplier = float(game_state.skeleton.cost_multiplier - upgrade["effect_value"])
         game_state.skeleton.recalculate_cost()
     elif upgrade["effect_type"] == "zombie_cost_multiplier":
-        game_state.zombie.cost_multiplier = float(upgrade["effect_value"])
+        game_state.zombie.cost_multiplier = float(game_state.zombie.cost_multiplier - upgrade["effect_value"])
         game_state.zombie.recalculate_cost()
     elif upgrade["effect_type"] == "skeleton_multiplier":
         game_state.skeleton.global_multiplier += float(upgrade["effect_value"])

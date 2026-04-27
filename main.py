@@ -59,7 +59,7 @@ def handle_buy_undead(undead):
     update_ui()
 
 def unlock_undead():
-    if game_state.vampire.unlocked is False and game_state.wraith.count >= 20:
+    if game_state.vampire.unlocked is False and game_state.wraith.count >= 10:
         game_state.vampire.unlocked = True
         create_notification("New Undead Unlocked: Vampire")
 
@@ -311,16 +311,7 @@ total_clicks_stat.grid(row=6, column=2, sticky="e")
 info_content = tk.Frame(info_tab, bg=style.background_color)
 info_content.pack(pady=(10, 0))
 
-info_text = """Welcome, aspiring necromancer. Your goal is to gather one billion souls to summon the Undead King and harness his power to rule the world.
-
-First you need to collect Souls manually (by clicking "Gather Souls" button). Use those Souls to raise Undead minions (you will unlock more as the game goes on). They will do your bidding, passively generating Souls... which you can spend to raise more of them, or buy permanent upgrades.
-
-New upgrades show up in "Upgrades" tab when certain conditions are met (such as raising 10 of a specific Undead, clicking X times or after a certain amount of time passes). You will get notified whenever a new upgrade is available.
-
-You can also view your progress in "Stats" tab.
-
-This is my first personal project created with Python/Tkinter. If you want to learn more, check out README.md. Enjoy!"""
-info_label = tk.Label(info_content, text=info_text, font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=480)
+info_label = tk.Label(info_content, text=style.info_text, font=style.info_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=480)
 info_label.pack()
 
 update_ui()
