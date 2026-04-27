@@ -5,16 +5,19 @@ tick_rate = 1000
 tick_count = 0
 souls = 0
 souls_multiplier = 1
+souls_tick_multiplier = 0
 total_souls_gained = 0
 total_souls_spent = 0
 click_count = 0
 click_power = 0.1
+click_passive_scaling = 0
+wraith_per_zombie_scaling = 0
 
 #Undead
 skeleton = Undead("Skeleton", "Skeletons", 0, 1, 1.3, 0.2, True)
 zombie = Undead("Zombie", "Zombies", 0, 10, 1.3, 0.6, True)
 wraith = Undead("Wraith", "Wraiths", 0, 1000, 1.3, 10, True)
-vampire = Undead("Vampire", "Vampires", 0, 50000, 1.3, 300, False)
+vampire = Undead("Vampire", "Vampires", 0, 50000, 1.3, 100, False)
 lich = Undead("Lich", "Liches", 0, 1000000, 1.3, 10000, False)
 
 undead_list = [skeleton, zombie, wraith, vampire, lich]
@@ -147,9 +150,9 @@ upgrades = [
     "cost": 15000,
     "bought": False,
     "requirement": lambda: wraith.count >= 5,
-    "effect_type": "wraith_cost_multiplier",
+    "effect_type": "wraith_per_zombie_scaling",
     "effect_value": 0.001,
-    "description": "Each Zombie reduces the cost scaling of Wraiths by 0.001."
+    "description": "Each Zombie reduces the cost scaling of Wraiths by 0.001 (retroactive!)"
 },
 {
     "id": 14,
@@ -164,7 +167,7 @@ upgrades = [
 {
     "id": 15,
     "name": "Upgrade #15",
-    "cost": 25000,
+    "cost": 28000,
     "bought": False,
     "requirement": lambda: zombie.count >= 40,
     "effect_type": "skeleton_zombie_power",
@@ -177,7 +180,7 @@ upgrades = [
     "cost": 33000,
     "bought": False,
     "requirement": lambda: click_count >= 1500,
-    "effect_type": "passive_click_scaling",
+    "effect_type": "click_passive_scaling",
     "effect_value": 0.02,
     "description": "Gathering Souls now scales with passive Souls harvest (2%)"
 },
@@ -196,7 +199,7 @@ upgrades = [
     "name": "Upgrade #18",
     "cost": 66666,
     "bought": False,
-    "requirement": lambda: total_souls_spent >= 100000,
+    "requirement": lambda: total_souls_spent >= 300000,
     "effect_type": "souls_tick_multiplier",
     "effect_value": 0.01,
     "description": "Increases the Souls harvest by 1% per 10 game Ticks"
@@ -206,7 +209,7 @@ upgrades = [
     "name": "Upgrade #19",
     "cost": 91100,
     "bought": False,
-    "requirement": lambda: tick_count >= 800,
+    "requirement": lambda: tick_count >= 1200,
     "effect_type": "tick_rate",
     "effect_value": 0.8,
     "description": "Decreases the Tick Rate by 20% (everything becomes faster!)"

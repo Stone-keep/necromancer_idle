@@ -7,10 +7,13 @@ def build_save_dictionary():
                        "tick_count": game_state.tick_count,
                        "souls": game_state.souls,
                        "souls_multiplier": game_state.souls_multiplier,
+                       "souls_tick_multiplier": game_state.souls_tick_multiplier,
                        "total_souls_gained": game_state.total_souls_gained,
                        "total_souls_spent": game_state.total_souls_spent,
                        "click_count": game_state.click_count,
                        "click_power": game_state.click_power,
+                       "click_passive_scaling": game_state.click_passive_scaling,
+                       "wraith_per_zombie_scaling": game_state.wraith_per_zombie_scaling,
                        "undeads": {},
                        "upgrades_status": {}
                        }
@@ -39,10 +42,13 @@ def load_save_from_dictionary(save_dictionary):
     game_state.tick_count = int(save_dictionary["tick_count"])
     game_state.souls = float(save_dictionary["souls"])
     game_state.souls_multiplier = float(save_dictionary["souls_multiplier"])
+    game_state.souls_tick_multiplier = float(save_dictionary["souls_tick_multiplier"])
     game_state.total_souls_gained = float(save_dictionary["total_souls_gained"])
     game_state.total_souls_spent = float(save_dictionary["total_souls_spent"])
     game_state.click_count = int(save_dictionary["click_count"])
     game_state.click_power = float(save_dictionary["click_power"])
+    game_state.click_passive_scaling = float(save_dictionary["click_passive_scaling"])
+    game_state.wraith_per_zombie_scaling = float(save_dictionary["wraith_per_zombie_scaling"])
     # Loading Undead
     undeads = save_dictionary["undeads"]
     for undead in game_state.undead_list:

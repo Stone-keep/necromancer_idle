@@ -34,6 +34,18 @@ def apply_upgrade_effect(upgrade):
         game_state.zombie.recalculate_cost()
     elif upgrade["effect_type"] == "skeleton_multiplier":
         game_state.skeleton.global_multiplier += float(upgrade["effect_value"])
+    elif upgrade["effect_type"] == "skeleton_zombie_power":
+        game_state.skeleton.power *= upgrade["effect_value"]
+        game_state.zombie.power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "wraith_per_zombie_scaling":
+        game_state.wraith_per_zombie_scaling += upgrade["effect_value"]
+        game_state.wraith.recalculate_cost()
+    elif upgrade["effect_type"] == "wraith_multiplier":
+        game_state.wraith.global_multiplier += float(upgrade["effect_value"])
+    elif upgrade["effect_type"] == "click_passive_scaling":
+        game_state.click_passive_scaling += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "souls_tick_multiplier":
+        game_state.souls_tick_multiplier += upgrade["effect_value"]
     else:
         raise ValueError("Upgrade effect type not found")
 
@@ -54,7 +66,7 @@ def undead_global_multiplier():
     return global_multiplier
 
 def total_passive_gain():
-    return sum(undead.passive_gain() for undead in game_state.undead_list) * undead_global_multiplier()
+    return sum(undead.passive_gain() for undead in game_state.undead_list) * undead_global_multiplier() * (1 + (game_state.tick_count // 10) * game_state.souls_tick_multiplier)
 
 def gain_souls(amount):
     game_state.souls = round(game_state.souls + (amount * game_state.souls_multiplier), 1)
@@ -65,13 +77,15 @@ def spend_souls(cost):
     game_state.total_souls_spent = round(game_state.total_souls_spent + cost, 1)
 
 def collect_soul_click():
+    passive_scaling = game_state.click_passive_scaling * total_passive_gain()
     game_state.click_count += 1
-    gain_souls(game_state.click_power)
+    gain_souls(game_state.click_power + passive_scaling)
     
 def buy_undead(undead):
     if game_state.souls >= undead.cost:
         spend_souls(undead.cost)
         undead.buy()
+        recalculate_all_undead_cost()
 
 def update_button_state(button, cost):
     if game_state.souls >= cost:
@@ -84,3 +98,15 @@ def undead_status_production(undead):
 
 def undead_button_production(undead):
     return f"Each {undead.name} produces {undead.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier():.1f} Souls per second"
+
+def true_cost_multiplier(undead):
+    multiplier = undead.cost_multiplier
+
+    if undead.name == "Wraith":
+        multiplier -= game_state.wraith_per_zombie_scaling * game_state.zombie.count
+    
+    return max(multiplier, 1.1)
+
+def recalculate_all_undead_cost():
+    for undead in game_state.undead_list:
+        undead.recalculate_cost()
