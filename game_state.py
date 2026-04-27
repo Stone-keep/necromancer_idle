@@ -19,6 +19,7 @@ zombie = Undead("Zombie", "Zombies", 0, 10, 1.3, 0.6, True)
 wraith = Undead("Wraith", "Wraiths", 0, 1000, 1.3, 10, True)
 vampire = Undead("Vampire", "Vampires", 0, 50000, 1.3, 100, False)
 lich = Undead("Lich", "Liches", 0, 1000000, 1.3, 10000, False)
+undead_king = Undead("Undead King", "Undead King", 0, 1000000000, 1.3, 1000000, True)
 
 undead_list = [skeleton, zombie, wraith, vampire, lich]
 
@@ -119,7 +120,7 @@ upgrades = [
     "name": "Upgrade #10",
     "cost": 6666,
     "bought": False,
-    "requirement": lambda: click_count >= 1000,
+    "requirement": lambda: click_count >= 1300,
     "effect_type": "click_power",
     "effect_value": 6.66,
     "description": "Gathering Souls (Clicking) is 6.66x more powerful."
@@ -147,7 +148,7 @@ upgrades = [
 {
     "id": 13,
     "name": "Upgrade #13",
-    "cost": 15000,
+    "cost": 13000,
     "bought": False,
     "requirement": lambda: wraith.count >= 5,
     "effect_type": "wraith_per_zombie_scaling",
@@ -162,14 +163,14 @@ upgrades = [
     "requirement": lambda: wraith.count >= 10,
     "effect_type": "wraith_power",
     "effect_value": 3,
-    "description": "Wraiths Harvest 3x more Souls"
+    "description": "Wraiths harvest 3x more Souls"
 },
 {
     "id": 15,
     "name": "Upgrade #15",
     "cost": 28000,
     "bought": False,
-    "requirement": lambda: zombie.count >= 40,
+    "requirement": lambda: zombie.count >= 35,
     "effect_type": "skeleton_zombie_power",
     "effect_value": 2.5,
     "description": "Skeletons and Zombies harvest 2.5x more Souls"
@@ -179,7 +180,7 @@ upgrades = [
     "name": "Upgrade #16",
     "cost": 33000,
     "bought": False,
-    "requirement": lambda: click_count >= 1500,
+    "requirement": lambda: click_count >= 2000,
     "effect_type": "click_passive_scaling",
     "effect_value": 0.02,
     "description": "Gathering Souls now scales with passive Souls harvest (2%)"
@@ -199,7 +200,7 @@ upgrades = [
     "name": "Upgrade #18",
     "cost": 66666,
     "bought": False,
-    "requirement": lambda: total_souls_spent >= 300000,
+    "requirement": lambda: total_souls_spent >= 600000,
     "effect_type": "souls_tick_multiplier",
     "effect_value": 0.01,
     "description": "Increases the Souls harvest by 1% per 10 game Ticks"

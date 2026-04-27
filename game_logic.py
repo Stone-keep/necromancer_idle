@@ -100,7 +100,7 @@ def undead_status_production(undead):
     return f"{undead.passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier() * souls_for_ticks_multiplier():.1f}/s"
 
 def undead_button_production(undead):
-    return f"Each {undead.name} produces {undead.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier() * souls_for_ticks_multiplier():.1f} Souls per second"
+    return f"Each {undead.name} produces\n{undead.power * (1000 / game_state.tick_rate) * game_state.souls_multiplier * undead_global_multiplier() * souls_for_ticks_multiplier():.1f} Souls per second"
 
 def true_cost_multiplier(undead):
     multiplier = undead.cost_multiplier

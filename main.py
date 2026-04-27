@@ -17,8 +17,8 @@ def update_ui():
     souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
 
     # Create & Update Undead Status
-    create_undead_status_widgets()
-    update_undead_status_widgets()
+    create_undead_status_labels()
+    update_undead_status_labels()
 
     # Create & Update Undead Buttons/Labels
     
@@ -31,7 +31,7 @@ def update_ui():
     souls_multiplier_stat.config(text=f"{game_state.souls_multiplier:.1f}x")
     tick_rate_stat.config(text=f"{(1000 / game_state.tick_rate):.2f}")
     total_ticks_stat.config(text=f"{game_state.tick_count}")
-    click_power_stat.config(text=f"{game_state.click_power:.1f}")
+    click_power_stat.config(text=f"{game_state.click_power + (game_state.click_passive_scaling * game_logic.total_passive_gain()):.1f}")
     total_clicks_stat.config(text=f"{game_state.click_count}")
 
     # Update Available Upgrades
@@ -66,7 +66,7 @@ def unlock_undead():
 # UI
 root = tk.Tk()
 root.title("Necromancer Idle")
-root.geometry("500x800")
+root.geometry("550x850")
 root.resizable(False, False)
 root.configure(bg=style.background_color)
 
@@ -85,35 +85,35 @@ souls_passive.grid(row=1, column=1, columnspan=3)
 collect_button = tk.Button(status_frame, text="Gather Souls", **style.collect_button_style, command=handle_collect_click)
 collect_button.grid(row=2, column=1, columnspan=3, ipadx=15, ipady=7, pady=25)
 
-undead_status_widgets = {}
+undead_status_labels = {}
 
-def create_undead_status_widgets():
-    new_undead_row = 3 + len(undead_status_widgets)
+def create_undead_status_labels():
+    new_undead_row = 3 + len(undead_status_labels)
     for undead in game_state.undead_list:
         undead_name = undead.name
-        if undead_name in undead_status_widgets:
+        if undead_name in undead_status_labels:
             continue
         name = tk.Label(status_frame, text="", font=style.undead_label_font, bg=style.background_color, fg=style.text_color)
         count = tk.Label(status_frame, text="", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
         souls = tk.Label(status_frame, text="", font=style.undead_stats_font, bg=style.background_color, fg=style.text_color)
-        undead_status_widgets[undead_name] = {
+        undead_status_labels[undead_name] = {
             "name": name,
             "count": count,
             "souls": souls
         }
-        name.grid(row=new_undead_row, column=1, sticky="w", padx=5)
-        count.grid(row=new_undead_row, column=2, padx=5)
-        souls.grid(row=new_undead_row, column=3, sticky="e", padx=5)
+        name.grid(row=new_undead_row, column=1, sticky="w", padx=(0, 10))
+        count.grid(row=new_undead_row, column=2, padx=10)
+        souls.grid(row=new_undead_row, column=3, sticky="e", padx=(10, 0))
         new_undead_row += 1
 
-def update_undead_status_widgets():
+def update_undead_status_labels():
     for undead in game_state.undead_list:
         undead_name = undead.name
-        if undead_name not in undead_status_widgets:
+        if undead_name not in undead_status_labels:
             continue
-        name = undead_status_widgets[undead_name]["name"]
-        count = undead_status_widgets[undead_name]["count"]
-        souls = undead_status_widgets[undead_name]["souls"]
+        name = undead_status_labels[undead_name]["name"]
+        count = undead_status_labels[undead_name]["count"]
+        souls = undead_status_labels[undead_name]["souls"]
         if undead.unlocked:
             name.config(text=f"{undead.name_plural}:")
             count.config(text=f"{undead.count}")
@@ -210,21 +210,21 @@ undead_content.grid_columnconfigure(2, weight=1)
 undead_buttons = {}
 
 def create_undead_buttons():
-    new_button_row = len(undead_buttons) * 2
+    new_button_row = len(undead_buttons)
     for undead in game_state.undead_list:
         name = undead.name
         if name in undead_buttons:
             continue
         if undead.unlocked:
-            button = tk.Button(undead_content, text=f"Buy {undead.name} (Cost: {undead.cost})", command=lambda current_undead = undead: handle_buy_undead(current_undead), state="disabled", **style.shop_button_style)
-            label = tk.Label(undead_content, text=game_logic.undead_button_production(undead), font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+            button = tk.Button(undead_content, text=f"Raise {undead.name}\n(Cost: {undead.cost})", command=lambda current_undead = undead: handle_buy_undead(current_undead), state="disabled", **style.shop_button_style)
+            label = tk.Label(undead_content, text=game_logic.undead_button_production(undead), font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, justify="center", wraplength=300)
             undead_buttons[name] = {
                 "button": button,
                 "label": label
             }
-            button.grid(row=new_button_row, column=1, pady=(10, 0))
-            label.grid(row=new_button_row+1, column=1)
-            new_button_row += 2
+            button.grid(row=new_button_row, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
+            label.grid(row=new_button_row, column=2, pady=(10, 0), padx=(25, 0), sticky="e")
+            new_button_row += 1
 
 def update_undead_buttons():
     for undead in game_state.undead_list:
@@ -233,7 +233,7 @@ def update_undead_buttons():
             continue
         button = undead_buttons[name]["button"]
         label = undead_buttons[name]["label"]
-        button.config(text=f"Buy {undead.name} (Cost: {undead.cost})")
+        button.config(text=f"Raise {undead.name}\n(Cost: {undead.cost})")
         label.config(text=game_logic.undead_button_production(undead))    
         game_logic.update_button_state(button, undead.cost)
 
@@ -254,15 +254,15 @@ def create_upgrade_frames():
             game_logic.update_button_state(game_state.upgrade_frames[upgrade_id]["button"], cost)
             continue
         frame = tk.Frame(upgrades_content, bg=style.background_color)
-        button = tk.Button(frame, text=f"{name} (Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
-        label = tk.Label(frame, text=f"{description}", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+        button = tk.Button(frame, text=f"{name}\n(Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
+        label = tk.Label(frame, text=f"{description}", font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, wraplength=400, justify="center")
         game_state.upgrade_frames[upgrade_id] = {
             "frame": frame,
             "button": button,
             "label": label
         }
         
-        frame.pack(pady=(0, 10))
+        frame.pack(pady=(10, 0))
         button.pack()
         label.pack()
         create_notification(f"New Upgrade Available: {name}")
@@ -278,9 +278,9 @@ for row in range(7):
     stats_content.grid_rowconfigure(row, pad=4)
 
 souls_gained_label = tk.Label(stats_content, text="Total Souls Gained:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
-souls_gained_label.grid(row=0, column=1, sticky="w", padx=(0, 35))
+souls_gained_label.grid(row=0, column=1, sticky="w", padx=(0, 40))
 souls_gained_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
-souls_gained_stat.grid(row=0, column=2, sticky="e", padx=(35, 0))
+souls_gained_stat.grid(row=0, column=2, sticky="e", padx=(40, 0))
 souls_spent_label = tk.Label(stats_content, text="Total Souls Spent:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
 souls_spent_label.grid(row=1, column=1, sticky="w")
 souls_spent_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
@@ -311,7 +311,7 @@ total_clicks_stat.grid(row=6, column=2, sticky="e")
 info_content = tk.Frame(info_tab, bg=style.background_color)
 info_content.pack(pady=(10, 0))
 
-info_label = tk.Label(info_content, text=style.info_text, font=style.info_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=480)
+info_label = tk.Label(info_content, text=style.info_text, font=style.info_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=530)
 info_label.pack()
 
 update_ui()
