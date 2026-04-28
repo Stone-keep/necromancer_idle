@@ -35,7 +35,7 @@ def update_ui():
     total_clicks_stat.config(text=f"{game_state.click_count}")
 
     # Update Available Upgrades
-    create_upgrade_frames()
+    create_upgrade_buttons()
 
 def auto_save():
     save_system.save_to_json()
@@ -61,7 +61,10 @@ def handle_buy_undead(undead):
 def unlock_undead():
     if game_state.vampire.unlocked is False and game_state.wraith.count >= 10:
         game_state.vampire.unlocked = True
-        create_notification("New Undead Unlocked: Vampire")
+        create_notification("You can now raise Vampires")
+    if game_state.lich.unlocked is False and game_state.vampire.count >= 10:
+        game_state.lich.unlocked = True
+        create_notification("You can now raise Liches")
 
 # UI
 root = tk.Tk()
@@ -101,9 +104,9 @@ def create_undead_status_labels():
             "count": count,
             "souls": souls
         }
-        name.grid(row=new_undead_row, column=1, sticky="w", padx=(0, 10))
-        count.grid(row=new_undead_row, column=2, padx=10)
-        souls.grid(row=new_undead_row, column=3, sticky="e", padx=(10, 0))
+        name.grid(row=new_undead_row, column=1, sticky="w", padx=(0, 15))
+        count.grid(row=new_undead_row, column=2, padx=15)
+        souls.grid(row=new_undead_row, column=3, sticky="e", padx=(15, 0))
         new_undead_row += 1
 
 def update_undead_status_labels():
@@ -205,7 +208,7 @@ else:
 undead_content = tk.Frame(undead_tab, bg=style.background_color)
 undead_content.pack(pady=(10, 0))
 undead_content.grid_columnconfigure(0, weight=1)
-undead_content.grid_columnconfigure(2, weight=1)
+undead_content.grid_columnconfigure(3, weight=1)
 
 undead_buttons = {}
 
@@ -217,13 +220,13 @@ def create_undead_buttons():
             continue
         if undead.unlocked:
             button = tk.Button(undead_content, text=f"Raise {undead.name}\n(Cost: {undead.cost})", command=lambda current_undead = undead: handle_buy_undead(current_undead), state="disabled", **style.shop_button_style)
-            label = tk.Label(undead_content, text=game_logic.undead_button_production(undead), font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, justify="center", wraplength=300)
+            label = tk.Label(undead_content, text=game_logic.undead_button_production(undead), font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, justify="center", wraplength=250)
             undead_buttons[name] = {
                 "button": button,
                 "label": label
             }
-            button.grid(row=new_button_row, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
-            label.grid(row=new_button_row, column=2, pady=(10, 0), padx=(25, 0), sticky="e")
+            button.grid(row=new_button_row, column=1, pady=(10, 0), padx=(0, 30), sticky="w")
+            label.grid(row=new_button_row, column=2, pady=(10, 0), padx=(30, 0), sticky="ew")
             new_button_row += 1
 
 def update_undead_buttons():
@@ -242,29 +245,30 @@ def update_undead_buttons():
 
 upgrades_content = tk.Frame(upgrades_tab, bg=style.background_color)
 upgrades_content.pack(pady=(10, 0))
+upgrades_content.grid_columnconfigure(0, weight=1)
+upgrades_content.grid_columnconfigure(1, weight=1)
 
-def create_upgrade_frames():
+def create_upgrade_buttons():
+    new_button_row = len(game_state.upgrade_buttons)
     available_upgrades = game_logic.get_available_upgrades()
     for upgrade in available_upgrades:
         upgrade_id = upgrade["id"]
         name = upgrade["name"]
         cost = upgrade["cost"]
         description = upgrade["description"]
-        if upgrade_id in game_state.upgrade_frames:
-            game_logic.update_button_state(game_state.upgrade_frames[upgrade_id]["button"], cost)
+        if upgrade_id in game_state.upgrade_buttons:
+            game_logic.update_button_state(game_state.upgrade_buttons[upgrade_id]["button"], cost)
             continue
-        frame = tk.Frame(upgrades_content, bg=style.background_color)
-        button = tk.Button(frame, text=f"{name}\n(Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
-        label = tk.Label(frame, text=f"{description}", font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, wraplength=400, justify="center")
-        game_state.upgrade_frames[upgrade_id] = {
-            "frame": frame,
+        button = tk.Button(upgrades_content, text=f"{name}\n(Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
+        label = tk.Label(upgrades_content, text=f"{description}", font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, wraplength=250, justify="center")
+        game_state.upgrade_buttons[upgrade_id] = {
             "button": button,
             "label": label
         }
         
-        frame.pack(pady=(10, 0))
-        button.pack()
-        label.pack()
+        button.grid(row=new_button_row, column=0, pady=(10, 0), padx=(0, 30), sticky="w")
+        label.grid(row=new_button_row, column=1, pady=(10, 0), padx=(30, 0), sticky="ew")
+        new_button_row += 1
         create_notification(f"New Upgrade Available: {name}")
         game_logic.update_button_state(button, cost)
         

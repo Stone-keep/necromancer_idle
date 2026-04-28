@@ -13,13 +13,16 @@ click_power = 0.1
 click_passive_scaling = 0
 wraith_per_zombie_scaling = 0
 
+undead_king_unlocked = False
+victory_achieved = False
+
+
 #Undead
 skeleton = Undead("Skeleton", "Skeletons", 0, 1, 1.3, 0.2, True)
 zombie = Undead("Zombie", "Zombies", 0, 10, 1.3, 0.6, True)
 wraith = Undead("Wraith", "Wraiths", 0, 1000, 1.3, 10, True)
 vampire = Undead("Vampire", "Vampires", 0, 50000, 1.3, 100, False)
 lich = Undead("Lich", "Liches", 0, 1000000, 1.3, 1000, False)
-undead_king = Undead("Undead King", "Undead King", 0, 1000000000, 1.3, 1000000, True)
 
 undead_list = [skeleton, zombie, wraith, vampire, lich]
 
@@ -318,13 +321,13 @@ upgrades = [
 {
     "id": 30,
     "name": "Upgrade #30",
-    "cost": 250000000,
+    "cost": 200000000,
     "bought": False,
-    "requirement": lambda: total_souls_gained >= 1000000000,
+    "requirement": lambda: total_souls_spent >= 500000000,
     "effect_type": "souls_tick_multiplier",
     "effect_value": 0.03,
     "description": "Increases the Souls harvest by 0.3% per 10 game Ticks."
 },
 ]
 
-upgrade_frames = {}
+upgrade_buttons = {}

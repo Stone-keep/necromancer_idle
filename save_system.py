@@ -14,6 +14,8 @@ def build_save_dictionary():
                        "click_power": game_state.click_power,
                        "click_passive_scaling": game_state.click_passive_scaling,
                        "wraith_per_zombie_scaling": game_state.wraith_per_zombie_scaling,
+                       "undead_king_unlocked": game_state.undead_king_unlocked,
+                       "victory_achieved": game_state.victory_achieved,
                        "undeads": {},
                        "upgrades_status": {}
                        }
@@ -49,6 +51,8 @@ def load_save_from_dictionary(save_dictionary):
     game_state.click_power = float(save_dictionary["click_power"])
     game_state.click_passive_scaling = float(save_dictionary["click_passive_scaling"])
     game_state.wraith_per_zombie_scaling = float(save_dictionary["wraith_per_zombie_scaling"])
+    game_state.undead_king_unlocked = bool(save_dictionary["undead_king_unlocked"])
+    game_state.victory_achieved = bool(save_dictionary["victory_achieved"])
     # Loading Undead
     undeads = save_dictionary["undeads"]
     for undead in game_state.undead_list:

@@ -55,9 +55,10 @@ def buy_upgrade(upgrade):
         upgrade["bought"] = True
         apply_upgrade_effect(upgrade)
         upgrade_id = upgrade["id"]
-        if upgrade_id in game_state.upgrade_frames:
-            game_state.upgrade_frames[upgrade_id]["frame"].destroy()
-            game_state.upgrade_frames.pop(upgrade_id)
+        if upgrade_id in game_state.upgrade_buttons:
+            game_state.upgrade_buttons[upgrade_id]["button"].destroy()
+            game_state.upgrade_buttons[upgrade_id]["label"].destroy()
+            game_state.upgrade_buttons.pop(upgrade_id)
 
 def undead_global_multiplier():
     global_multiplier = 1
