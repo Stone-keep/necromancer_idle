@@ -2,40 +2,14 @@ import tkinter as tk
 from tkinter import ttk
 import game_state, game_logic, save_system, style
 
-
 def game_loop():
     game_state.tick_count += 1
     passive_gain = game_logic.total_passive_gain()
     game_logic.gain_souls(passive_gain)
     unlock_undead()
     update_ui()
-    root.after(game_state.tick_rate, game_loop)
-
-def update_ui():
-    # Update Game Status Labels
-    souls_label.config(text=f"Souls: {game_state.souls:.1f}")
-    souls_passive.config(text=f"({game_logic.total_passive_gain() * (1000 / game_state.tick_rate) * game_state.souls_multiplier:.1f}/s)")
-
-    # Create & Update Undead Status
-    create_undead_status_labels()
-    update_undead_status_labels()
-
-    # Create & Update Undead Buttons/Labels
-    
-    create_undead_buttons()
-    update_undead_buttons()
-    
-    # Update Stats Labels
-    souls_gained_stat.config(text=f"{game_state.total_souls_gained}")
-    souls_spent_stat.config(text=f"{game_state.total_souls_spent}")
-    souls_multiplier_stat.config(text=f"{game_state.souls_multiplier:.1f}x")
-    tick_rate_stat.config(text=f"{(1000 / game_state.tick_rate):.2f}")
-    total_ticks_stat.config(text=f"{game_state.tick_count}")
-    click_power_stat.config(text=f"{game_state.click_power + (game_state.click_passive_scaling * game_logic.total_passive_gain()):.1f}")
-    total_clicks_stat.config(text=f"{game_state.click_count}")
-
-    # Update Available Upgrades
-    create_upgrade_buttons()
+    tickrate = game_logic.tickrate_after_vampires(game_state.tick_rate)
+    root.after(tickrate, game_loop)
 
 def auto_save():
     save_system.save_to_json()
@@ -61,24 +35,48 @@ def handle_buy_undead(undead):
 def unlock_undead():
     if game_state.vampire.unlocked is False and game_state.wraith.count >= 10:
         game_state.vampire.unlocked = True
-        create_notification("You can now raise Vampires")
+        create_notification("You can now raise Vampires", style.notification_undead_color)
     if game_state.lich.unlocked is False and game_state.vampire.count >= 10:
         game_state.lich.unlocked = True
-        create_notification("You can now raise Liches")
-    
+        create_notification("You can now raise Liches", style.notification_undead_color)
 
-# UI
+def update_ui():
+    # Update Game Status Labels
+    souls_label.config(text=f"Souls: {game_logic.decimal_or_commas(game_state.souls)}")
+    souls_passive.config(text=f"({game_logic.decimal_or_commas(game_logic.total_passive_gain() * (1000 / game_logic.tickrate_after_vampires(game_state.tick_rate)) * game_state.souls_multiplier)}/s)")
+
+    # Create & Update Undead Status
+    create_undead_status_labels()
+    update_undead_status_labels()
+
+    # Create & Update Undead Buttons/Labels
+    create_undead_buttons()
+    update_undead_buttons()
+    
+    # Update Stats Labels
+    souls_gained_stat.config(text=f"{game_state.total_souls_gained}")
+    souls_spent_stat.config(text=f"{game_state.total_souls_spent}")
+    souls_multiplier_stat.config(text=f"{game_state.souls_multiplier:.1f}x")
+    tick_rate_stat.config(text=f"{(1000 / game_logic.tickrate_after_vampires(game_state.tick_rate)):.2f}")
+    total_ticks_stat.config(text=f"{game_state.tick_count:,}")
+    click_power_stat.config(text=f"{game_logic.decimal_or_commas(game_state.click_power + (game_state.click_passive_scaling * game_logic.total_passive_gain()))}")
+    total_clicks_stat.config(text=f"{game_state.click_count:,}")
+
+    # Create Available Upgrades
+    create_upgrade_buttons()
+
+# UI (Root)
 root = tk.Tk()
 root.title("Necromancer Idle")
 root.geometry("550x850")
 root.resizable(False, False)
 root.configure(bg=style.background_color)
 
+# Main Game/Status Frame
 status_frame = tk.Frame(root)
 status_frame.pack(fill="x")
 status_frame.configure(bg=style.background_color)
 
-# Main Game/Status Frame
 status_frame.grid_columnconfigure(0, weight=1)
 status_frame.grid_columnconfigure(4, weight=1)
 
@@ -90,7 +88,6 @@ collect_button = tk.Button(status_frame, text="Gather Souls", **style.collect_bu
 collect_button.grid(row=2, column=1, columnspan=3, ipadx=15, ipady=7, pady=25)
 
 undead_status_labels = {}
-
 def create_undead_status_labels():
     new_undead_row = 3 + len(undead_status_labels)
     for undead in game_state.undead_list:
@@ -127,30 +124,27 @@ def update_undead_status_labels():
             count.config(text="")
             souls.config(text="")
         
-# Notification
-
+# Notifications
 notification_frame = tk.Frame(root)
 notification_frame.pack(fill="x", pady=(20, 10))
 notification_frame.configure(bg=style.background_color)
-
-notification_label = tk.Label(notification_frame, text="", font=style.notification_font, bg=style.background_color, fg=style.notification_color)
+notification_label = tk.Label(notification_frame, text="", font=style.notification_font, bg=style.background_color)
 notification_label.pack()
-
 notification_queue = []
 notification_status = False
 
-def create_notification(message):
+def create_notification(message, color):
     notification_queue.append(message)
-    show_next_notification()
+    show_next_notification(color)
     
-def show_next_notification():
+def show_next_notification(color):
     global notification_status
     if len(notification_queue) == 0:
         return
     if notification_status is True:
         return
     message = notification_queue.pop(0)
-    notification_label.config(text=message, fg=style.notification_color)
+    notification_label.config(text=message, fg=color)
     notification_status = True
     root.after(5000, clear_notification)
 
@@ -161,6 +155,7 @@ def clear_notification():
     if len(notification_queue) > 0:
         root.after(1000, show_next_notification)
         
+# Notebook (Tabs)
 
 notebook_style = ttk.Style()
 notebook_style.theme_use("default")
@@ -220,7 +215,7 @@ def create_undead_buttons():
         if name in undead_buttons:
             continue
         if undead.unlocked:
-            button = tk.Button(undead_content, text=f"Raise {undead.name}\n(Cost: {undead.cost})", command=lambda current_undead = undead: handle_buy_undead(current_undead), state="disabled", **style.shop_button_style)
+            button = tk.Button(undead_content, text=f"Raise {undead.name}\n(Cost: {undead.cost:,})", command=lambda current_undead = undead: handle_buy_undead(current_undead), state="disabled", **style.shop_button_style)
             label = tk.Label(undead_content, text=game_logic.undead_button_production(undead), font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, justify="center", wraplength=250)
             undead_buttons[name] = {
                 "button": button,
@@ -229,6 +224,16 @@ def create_undead_buttons():
             button.grid(row=new_button_row, column=1, pady=(10, 0), padx=(0, 30), sticky="w")
             label.grid(row=new_button_row, column=2, pady=(10, 0), padx=(30, 0), sticky="ew")
             new_button_row += 1
+    if game_state.total_souls_gained >= 500_000_000 and "undead_king" not in undead_buttons:
+        victory_button = tk.Button(undead_content, text="Summon Undead King\nCost: 1,000,000,000", command=trigger_victory, state="disabled", **style.shop_button_style)
+        victory_label = tk.Label(undead_content, text="Victory is near...", font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, justify="center")
+        undead_buttons["undead_king"] = {
+            "button": victory_button,
+            "label": victory_label
+            }
+        victory_button.grid(row=new_button_row, column=1, columnspan=2, pady=(10, 0), sticky="ew")
+        victory_label.grid(row=new_button_row+1, column=1, columnspan=2, pady=(10, 0), sticky="ew")
+
 
 def update_undead_buttons():
     for undead in game_state.undead_list:
@@ -240,10 +245,11 @@ def update_undead_buttons():
         button.config(text=f"Raise {undead.name}\n(Cost: {undead.cost})")
         label.config(text=game_logic.undead_button_production(undead))    
         game_logic.update_button_state(button, undead.cost)
+    if "undead_king" in undead_buttons:
+        game_logic.update_button_state(undead_buttons["undead_king"]["button"], 1_000_000_000)
 
 
 # Upgrades Tab
-
 upgrades_content = tk.Frame(upgrades_tab, bg=style.background_color)
 upgrades_content.pack(pady=(10, 0))
 upgrades_content.grid_columnconfigure(0, weight=1)
@@ -270,10 +276,10 @@ def create_upgrade_buttons():
         button.grid(row=new_button_row, column=0, pady=(10, 0), padx=(0, 30), sticky="w")
         label.grid(row=new_button_row, column=1, pady=(10, 0), padx=(30, 0), sticky="ew")
         new_button_row += 1
-        create_notification(f"New Upgrade Available: {name}")
+        create_notification(f"New Upgrade Available: {name}", style.notification_upgrade_color)
         game_logic.update_button_state(button, cost)
         
-# Stats
+# Stats Tab
 stats_content = tk.Frame(stats_tab, bg=style.background_color)
 stats_content.pack(pady=(10, 0))
 stats_content.grid_columnconfigure(0, weight=1)
@@ -311,13 +317,31 @@ total_clicks_label.grid(row=6, column=1, sticky="w")
 total_clicks_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 total_clicks_stat.grid(row=6, column=2, sticky="e")
 
-# Info
-
+# Info Tab
 info_content = tk.Frame(info_tab, bg=style.background_color)
 info_content.pack(pady=(10, 0))
-
 info_label = tk.Label(info_content, text=style.info_text, font=style.info_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=530)
 info_label.pack()
+
+# Victory Pop-Up
+def trigger_victory():
+    root.update_idletasks()
+    root_x = root.winfo_x()
+    root_y = root.winfo_y()
+    root_width = root.winfo_width()
+    root_height = root.winfo_height()
+    popup_x = root_x + (root_width // 2) - 200
+    popup_y = root_y + (root_height // 2) - 200
+    victory_window = tk.Toplevel(root)
+    victory_window.title("Victory!")
+    victory_window.geometry(f"400x400+{popup_x}+{popup_y}")
+    victory_window.resizable(False, False)
+    victory_window.overrideredirect(True)
+    victory_window.transient(root)
+    victory_window.configure(bg=style.background_color)
+    victory_window.grab_set()
+    victory_frame = tk.Frame(victory_window, bg=style.background_color, padx=20, pady=20)
+    victory_frame.pack()
 
 update_ui()
 game_loop()

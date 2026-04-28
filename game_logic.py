@@ -137,3 +137,16 @@ def true_cost_multiplier(undead):
 def recalculate_all_undead_cost():
     for undead in game_state.undead_list:
         undead.recalculate_cost()
+
+def decimal_or_commas(souls):
+    if souls < 1000:
+        return f"{souls:,.1f}"
+    else:
+        return f"{souls:,.0f}"
+    
+def tickrate_after_vampires(tickrate):
+    if game_state.vampire_tick_rate > 0:
+        vampire_modifier = (1 - game_state.vampire_tick_rate) ** game_state.vampire.count
+        return int(tickrate * vampire_modifier)
+    else:
+        return tickrate

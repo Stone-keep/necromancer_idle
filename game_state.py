@@ -209,7 +209,7 @@ upgrades = [
     "name": "Upgrade #18",
     "cost": 66666,
     "bought": False,
-    "requirement": lambda: total_souls_spent >= 600000,
+    "requirement": lambda: total_souls_spent >= 600_000,
     "effect_type": "souls_tick_multiplier",
     "effect_value": 0.002,
     "description": "Increases the Souls harvest by 0.2% per 10 game Ticks"
@@ -227,7 +227,7 @@ upgrades = [
 {
     "id": 20,
     "name": "Upgrade #20",
-    "cost": 200000,
+    "cost": 200_000,
     "bought": False,
     "requirement": lambda: vampire.count >= 5,
     "effect_type": "skeletons_per_vampire_scaling",
@@ -237,7 +237,7 @@ upgrades = [
 {
     "id": 21,
     "name": "Upgrade #21",
-    "cost": 400000,
+    "cost": 400_000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 55,
     "effect_type": "skeleton_power",
@@ -247,7 +247,7 @@ upgrades = [
 {
     "id": 22,
     "name": "Upgrade #22",
-    "cost": 800000,
+    "cost": 800_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 25,
     "effect_type": "vampire_wraith_power",
@@ -257,7 +257,7 @@ upgrades = [
 {
     "id": 23,
     "name": "Upgrade #23",
-    "cost": 1500000,
+    "cost": 1_500_000,
     "bought": False,
     "requirement": lambda: vampire.count >= 10,
     "effect_type": "vampire_tick_rate",
@@ -267,7 +267,7 @@ upgrades = [
 {
     "id": 24,
     "name": "Upgrade #24",
-    "cost": 2500000,
+    "cost": 2_500_000,
     "bought": False,
     "requirement": lambda: lich.count >= 1,
     "effect_type": "lich_summoning",
@@ -277,7 +277,7 @@ upgrades = [
 {
     "id": 25,
     "name": "Upgrade #25",
-    "cost": 5000000,
+    "cost": 5_000_000,
     "bought": False,
     "requirement": lambda: click_count >= 3000,
     "effect_type": "click_passive_scaling",
@@ -287,7 +287,7 @@ upgrades = [
 {
     "id": 26,
     "name": "Upgrade #26",
-    "cost": 10000000,
+    "cost": 10_000_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 35,
     "effect_type": "vampire_and_lich_per_wraith_scaling",
@@ -297,9 +297,9 @@ upgrades = [
 {
     "id": 27,
     "name": "Upgrade #27",
-    "cost": 20000000,
+    "cost": 20_000_000,
     "bought": False,
-    "requirement": lambda: total_souls_spent >= 100000000,
+    "requirement": lambda: total_souls_spent >= 100_000_000,
     "effect_type": "souls_gained_on_spend",
     "effect_value": 0.2,
     "description": "Harvest back 20% of the Souls you spend."
@@ -307,7 +307,7 @@ upgrades = [
 {
     "id": 28,
     "name": "Upgrade #28",
-    "cost": 50000000,
+    "cost": 50_000_000,
     "bought": False,
     "requirement": lambda: lich.count >= 10,
     "effect_type": "lich_multiplier",
@@ -317,7 +317,7 @@ upgrades = [
 {
     "id": 29,
     "name": "Upgrade #29",
-    "cost": 100000000,
+    "cost": 100_000_000,
     "bought": False,
     "requirement": lambda: vampire.count >= 20,
     "effect_type": "vampire_summoning",
@@ -327,9 +327,9 @@ upgrades = [
 {
     "id": 30,
     "name": "Upgrade #30",
-    "cost": 200000000,
+    "cost": 200_000_000,
     "bought": False,
-    "requirement": lambda: total_souls_spent >= 500000000,
+    "requirement": lambda: total_souls_spent >= 500_000_000,
     "effect_type": "souls_tick_multiplier",
     "effect_value": 0.03,
     "description": "Increases the Souls harvest by 0.3% per 10 game Ticks."
