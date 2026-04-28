@@ -54,12 +54,12 @@ def update_ui():
     update_undead_buttons()
     
     # Update Stats Labels
-    souls_gained_stat.config(text=f"{game_state.total_souls_gained}")
-    souls_spent_stat.config(text=f"{game_state.total_souls_spent}")
-    souls_multiplier_stat.config(text=f"{game_state.souls_multiplier:.1f}x")
+    souls_gained_stat.config(text=f"{game_logic.decimal_or_commas(game_state.total_souls_gained)}")
+    souls_spent_stat.config(text=f"{game_logic.decimal_or_commas(game_state.total_souls_spent)}")
+    souls_multiplier_stat.config(text=f"{game_state.souls_multiplier * game_logic.souls_for_ticks_multiplier():.2f}x")
     tick_rate_stat.config(text=f"{(1000 / game_logic.tickrate_after_vampires(game_state.tick_rate)):.2f}")
     total_ticks_stat.config(text=f"{game_state.tick_count:,}")
-    click_power_stat.config(text=f"{game_logic.decimal_or_commas(game_state.click_power + (game_state.click_passive_scaling * game_logic.total_passive_gain()))}")
+    click_power_stat.config(text=f"{game_logic.decimal_or_commas(game_state.click_power + (game_state.click_passive_scaling * game_logic.total_passive_gain()) * game_state.souls_multiplier)}")
     total_clicks_stat.config(text=f"{game_state.click_count:,}")
 
     # Create Available Upgrades
@@ -134,16 +134,18 @@ notification_queue = []
 notification_status = False
 
 def create_notification(message, color):
-    notification_queue.append(message)
-    show_next_notification(color)
+    notification = (message, color)
+    notification_queue.append(notification)
+    show_next_notification()
     
-def show_next_notification(color):
+def show_next_notification():
     global notification_status
     if len(notification_queue) == 0:
         return
     if notification_status is True:
         return
-    message = notification_queue.pop(0)
+    notification = notification_queue.pop(0)
+    message, color = notification
     notification_label.config(text=message, fg=color)
     notification_status = True
     root.after(5000, clear_notification)
@@ -242,7 +244,7 @@ def update_undead_buttons():
             continue
         button = undead_buttons[name]["button"]
         label = undead_buttons[name]["label"]
-        button.config(text=f"Raise {undead.name}\n(Cost: {undead.cost})")
+        button.config(text=f"Raise {undead.name}\n(Cost: {undead.cost:,})")
         label.config(text=game_logic.undead_button_production(undead))    
         game_logic.update_button_state(button, undead.cost)
     if "undead_king" in undead_buttons:
@@ -266,7 +268,7 @@ def create_upgrade_buttons():
         if upgrade_id in game_state.upgrade_buttons:
             game_logic.update_button_state(game_state.upgrade_buttons[upgrade_id]["button"], cost)
             continue
-        button = tk.Button(upgrades_content, text=f"{name}\n(Cost: {cost})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
+        button = tk.Button(upgrades_content, text=f"{name}\n(Cost: {cost:,})", command=lambda current_upgrade = upgrade: handle_upgrade_button(current_upgrade), state="disabled", **style.shop_button_style)
         label = tk.Label(upgrades_content, text=f"{description}", font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, wraplength=250, justify="center")
         game_state.upgrade_buttons[upgrade_id] = {
             "button": button,

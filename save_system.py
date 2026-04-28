@@ -18,7 +18,7 @@ def build_save_dictionary():
                        "vampire_and_lich_per_wraith_scaling": game_state.vampire_and_lich_per_wraith_scaling,
                        "vampire_tick_rate": game_state.vampire_tick_rate,
                        "lich_summoning": game_state.lich_summoning,
-                       "vampire_summoning": game_state.vampire_summoning,
+                       "lich_summoning_wraith": game_state.lich_summoning,
                        "souls_gained_on_spend": game_state.souls_gained_on_spend,
                        "undead_king_unlocked": game_state.undead_king_unlocked,
                        "victory_achieved": game_state.victory_achieved,
@@ -61,7 +61,7 @@ def load_save_from_dictionary(save_dictionary):
     game_state.vampire_and_lich_per_wraith_scaling = float(save_dictionary["vampire_and_lich_per_wraith_scaling"])
     game_state.vampire_tick_rate = float(save_dictionary["vampire_tick_rate"])
     game_state.lich_summoning = int(save_dictionary["lich_summoning"])
-    game_state.vampire_summoning = int(save_dictionary["vampire_summoning"])
+    game_state.lich_summoning_wraith = int(save_dictionary["lich_summoning_wraith"])
     game_state.souls_gained_on_spend = float(save_dictionary["souls_gained_on_spend"])
     game_state.undead_king_unlocked = bool(save_dictionary["undead_king_unlocked"])
     game_state.victory_achieved = bool(save_dictionary["victory_achieved"])

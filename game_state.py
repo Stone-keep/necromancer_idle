@@ -16,7 +16,7 @@ skeletons_per_vampire_scaling = 0
 vampire_and_lich_per_wraith_scaling = 0
 vampire_tick_rate = 0
 lich_summoning = 0
-vampire_summoning = 0
+lich_summoning_wraith = 0
 souls_gained_on_spend = 0
 
 undead_king_unlocked = False
@@ -28,7 +28,7 @@ skeleton = Undead("Skeleton", "Skeletons", 0, 1, 1.3, 0.2, True)
 zombie = Undead("Zombie", "Zombies", 0, 10, 1.3, 0.6, True)
 wraith = Undead("Wraith", "Wraiths", 0, 1000, 1.3, 10, True)
 vampire = Undead("Vampire", "Vampires", 0, 50000, 1.3, 100, False)
-lich = Undead("Lich", "Liches", 0, 1000000, 1.3, 1000, False)
+lich = Undead("Lich", "Liches", 0, 1000000, 1.3, 500, False)
 
 undead_list = [skeleton, zombie, wraith, vampire, lich]
 
@@ -36,7 +36,7 @@ undead_list = [skeleton, zombie, wraith, vampire, lich]
 upgrades = [
 {
     "id": 1,
-    "name": "Upgrade #1",
+    "name": "Warming Up",
     "cost": 20,
     "bought": False,
     "requirement": lambda: click_count >= 100,
@@ -46,7 +46,7 @@ upgrades = [
 },
 {
     "id": 2,
-    "name": "Upgrade #2",
+    "name": "More Calcium",
     "cost": 50,
     "bought": False,
     "requirement": lambda: skeleton.count >= 10,
@@ -56,7 +56,7 @@ upgrades = [
 },
 {
     "id": 3,
-    "name": "Upgrade #3",
+    "name": "Don't Dead Open Inside",
     "cost": 200,
     "bought": False,
     "requirement": lambda: zombie.count >= 10,
@@ -81,8 +81,8 @@ upgrades = [
     "bought": False,
     "requirement": lambda: total_souls_gained >= 1000,
     "effect_type": "souls_multiplier",
-    "effect_value": 1.3,
-    "description": "Harvest 1.3x more Souls from all sources."
+    "effect_value": 1.4,
+    "description": "Harvest 1.4x more Souls from all sources."
 },
 {
     "id": 6,
@@ -96,7 +96,7 @@ upgrades = [
 },
 {
     "id": 7,
-    "name": "Upgrade #7",
+    "name": "Good Bones",
     "cost": 2000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 20,
@@ -106,7 +106,7 @@ upgrades = [
 },
 {
     "id": 8,
-    "name": "Upgrade #8",
+    "name": "Doot Doot",
     "cost": 3000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 30,
@@ -191,8 +191,8 @@ upgrades = [
     "bought": False,
     "requirement": lambda: click_count >= 2000,
     "effect_type": "click_passive_scaling",
-    "effect_value": 0.02,
-    "description": "Gathering Souls now scales with passive Souls harvest (+2%)."
+    "effect_value": 0.03,
+    "description": "Gathering Souls now scales with passive Souls harvest (+3%)."
 },
 {
     "id": 17,
@@ -227,7 +227,17 @@ upgrades = [
 {
     "id": 20,
     "name": "Upgrade #20",
-    "cost": 200_000,
+    "cost": 150_000,
+    "bought": False,
+    "requirement": lambda: total_souls_gained >= 1_200_000,
+    "effect_type": "souls_multiplier",
+    "effect_value": 1.4,
+    "description": "Harvest 1.4x more Souls from all sources."
+},
+{
+    "id": 21,
+    "name": "Upgrade #20",
+    "cost": 300_000,
     "bought": False,
     "requirement": lambda: vampire.count >= 5,
     "effect_type": "skeletons_per_vampire_scaling",
@@ -235,17 +245,17 @@ upgrades = [
     "description": "Each Vampire reduces the Cost scaling of Skeletons by 0.005."
 },
 {
-    "id": 21,
+    "id": 22,
     "name": "Upgrade #21",
     "cost": 400_000,
     "bought": False,
-    "requirement": lambda: skeleton.count >= 55,
+    "requirement": lambda: skeleton.count >= 60,
     "effect_type": "skeleton_power",
     "effect_value": 4,
     "description": "Skeletons harvest 4x more Souls."
 },
 {
-    "id": 22,
+    "id": 23,
     "name": "Upgrade #22",
     "cost": 800_000,
     "bought": False,
@@ -255,7 +265,7 @@ upgrades = [
     "description": "Vampires and Wraiths harvest 1.5x more Souls."
 },
 {
-    "id": 23,
+    "id": 24,
     "name": "Upgrade #23",
     "cost": 1_500_000,
     "bought": False,
@@ -265,49 +275,69 @@ upgrades = [
     "description": "Each Vampire decreases the Tick Rate by 1%."
 },
 {
-    "id": 24,
+    "id": 25,
     "name": "Upgrade #24",
     "cost": 2_500_000,
     "bought": False,
     "requirement": lambda: lich.count >= 1,
     "effect_type": "lich_summoning",
     "effect_value": 1,
-    "description": "Each Lich also raises a Skeleton and a Zombie."
-},
-{
-    "id": 25,
-    "name": "Upgrade #25",
-    "cost": 5_000_000,
-    "bought": False,
-    "requirement": lambda: click_count >= 3000,
-    "effect_type": "click_passive_scaling",
-    "effect_value": 0.03,
-    "description": "Gathering Souls further scales with passive Souls harvest (+3%)."
+    "description": "Each Lich raises a Skeleton and a Zombie."
 },
 {
     "id": 26,
+    "name": "Upgrade #24",
+    "cost": 3_000_000,
+    "bought": False,
+    "requirement": lambda: zombie.count >= 60,
+    "effect_type": "zombie_power",
+    "effect_value": 3,
+    "description": "Zombies harvest 3x more Souls."
+},
+{
+    "id": 27,
+    "name": "Upgrade #25",
+    "cost": 5_000_000,
+    "bought": False,
+    "requirement": lambda: click_count >= 4000,
+    "effect_type": "click_passive_scaling",
+    "effect_value": 0.05,
+    "description": "Gathering Souls further scales with passive Souls harvest (+5%)."
+},
+{
+    "id": 28,
     "name": "Upgrade #26",
     "cost": 10_000_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 35,
     "effect_type": "vampire_and_lich_per_wraith_scaling",
-    "effect_value": 0.003,
-    "description": "Each Wraith reduces the Cost scaling of Vampires and Liches by 0.003."
+    "effect_value": 0.002,
+    "description": "Each Wraith reduces the Cost scaling of Vampires and Liches by 0.002."
 },
 {
-    "id": 27,
+    "id": 29,
     "name": "Upgrade #27",
     "cost": 20_000_000,
     "bought": False,
-    "requirement": lambda: total_souls_spent >= 100_000_000,
+    "requirement": lambda: total_souls_spent >= 80_000_000,
     "effect_type": "souls_gained_on_spend",
     "effect_value": 0.2,
     "description": "Harvest back 20% of the Souls you spend."
 },
 {
-    "id": 28,
+    "id": 30,
+    "name": "Upgrade #27",
+    "cost": 40_000_000,
+    "bought": False,
+    "requirement": lambda: wraith.count >= 40,
+    "effect_type": "lich_summoning_wraith",
+    "effect_value": 1,
+    "description": "Each Lich also raises a Wraith."
+},
+{
+    "id": 31,
     "name": "Upgrade #28",
-    "cost": 50_000_000,
+    "cost": 60_000_000,
     "bought": False,
     "requirement": lambda: lich.count >= 10,
     "effect_type": "lich_multiplier",
@@ -315,23 +345,23 @@ upgrades = [
     "description": "Each Lich increases Souls harvest of all Undead by 4%."
 },
 {
-    "id": 29,
+    "id": 32,
     "name": "Upgrade #29",
     "cost": 100_000_000,
     "bought": False,
-    "requirement": lambda: vampire.count >= 20,
-    "effect_type": "vampire_summoning",
-    "effect_value": 5,
-    "description": "Every fifth Vampire also raises a Lich."
+    "requirement": lambda: wraith.count >= 50,
+    "effect_type": "skeleton_wraith_power",
+    "effect_value": 2,
+    "description": "Skeletons and Wraiths harvest 2x more Souls."
 },
 {
-    "id": 30,
+    "id": 33,
     "name": "Upgrade #30",
     "cost": 200_000_000,
     "bought": False,
     "requirement": lambda: total_souls_spent >= 500_000_000,
     "effect_type": "souls_tick_multiplier",
-    "effect_value": 0.03,
+    "effect_value": 0.003,
     "description": "Increases the Souls harvest by 0.3% per 10 game Ticks."
 },
 ]
