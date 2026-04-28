@@ -65,6 +65,7 @@ def unlock_undead():
     if game_state.lich.unlocked is False and game_state.vampire.count >= 10:
         game_state.lich.unlocked = True
         create_notification("You can now raise Liches")
+    
 
 # UI
 root = tk.Tk()

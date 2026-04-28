@@ -41,11 +41,28 @@ def apply_upgrade_effect(upgrade):
         game_state.wraith_per_zombie_scaling += upgrade["effect_value"]
         game_state.wraith.recalculate_cost()
     elif upgrade["effect_type"] == "wraith_multiplier":
-        game_state.wraith.global_multiplier += float(upgrade["effect_value"])
+        game_state.wraith.global_multiplier += upgrade["effect_value"]
     elif upgrade["effect_type"] == "click_passive_scaling":
         game_state.click_passive_scaling += upgrade["effect_value"]
     elif upgrade["effect_type"] == "souls_tick_multiplier":
         game_state.souls_tick_multiplier += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "skeletons_per_vampire_scaling":
+        game_state.skeletons_per_vampire_scaling += upgrade["effect_value"]
+    elif upgrade ["effect_type"] == "vampire_wraith_power":
+        game_state.vampire.power *= upgrade ["effect_value"]
+        game_state.wraith.power *= upgrade["effect_value"]
+    elif upgrade ["effect_type"] == "vampire_tick_rate":
+        game_state.vampire_tick_rate += upgrade["effect_value"]
+    elif upgrade ["effect_type"] == "lich_summoning":
+        game_state.lich_summoning += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "vampire_and_lich_per_wraith_scaling":
+        game_state.vampire_and_lich_per_wraith_scaling += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "souls_gained_on_spend":
+        game_state.souls_gained_on_spend += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "lich_multiplier":
+        game_state.lich.global_multiplier += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "vampire_summoning":
+        game_state.vampire_summoning += upgrade["effect_value"]
     else:
         raise ValueError("Upgrade effect type not found")
 
@@ -108,7 +125,13 @@ def true_cost_multiplier(undead):
 
     if undead.name == "Wraith":
         multiplier -= game_state.wraith_per_zombie_scaling * game_state.zombie.count
-    
+    if undead.name == "Skeleton":
+        multiplier -= game_state.skeletons_per_vampire_scaling * game_state.vampire.count
+    if undead.name == "Vampire":
+        multiplier -= game_state.vampire_and_lich_per_wraith_scaling * game_state.wraith.count
+    if undead.name == "Lich":
+        multiplier -= game_state.vampire_and_lich_per_wraith_scaling * game_state.wraith.count
+        
     return max(multiplier, 1.1)
 
 def recalculate_all_undead_cost():

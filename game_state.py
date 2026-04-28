@@ -12,6 +12,12 @@ click_count = 0
 click_power = 0.1
 click_passive_scaling = 0
 wraith_per_zombie_scaling = 0
+skeletons_per_vampire_scaling = 0
+vampire_and_lich_per_wraith_scaling = 0
+vampire_tick_rate = 0
+lich_summoning = 0
+vampire_summoning = 0
+souls_gained_on_spend = 0
 
 undead_king_unlocked = False
 victory_achieved = False
@@ -205,7 +211,7 @@ upgrades = [
     "bought": False,
     "requirement": lambda: total_souls_spent >= 600000,
     "effect_type": "souls_tick_multiplier",
-    "effect_value": 0.02,
+    "effect_value": 0.002,
     "description": "Increases the Souls harvest by 0.2% per 10 game Ticks"
 },
 {
@@ -315,7 +321,7 @@ upgrades = [
     "bought": False,
     "requirement": lambda: vampire.count >= 20,
     "effect_type": "vampire_summoning",
-    "effect_value": 0.2,
+    "effect_value": 5,
     "description": "Every fifth Vampire also raises a Lich."
 },
 {
