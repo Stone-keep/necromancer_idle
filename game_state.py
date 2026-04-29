@@ -21,7 +21,7 @@ souls_gained_on_spend = 0
 
 undead_king_unlocked = False
 victory_achieved = False
-
+game_paused = False
 
 #Undead
 skeleton = Undead("Skeleton", "Skeletons", 0, 1, 1.3, 0.2, True)
@@ -356,7 +356,7 @@ upgrades = [
 },
 {
     "id": 33,
-    "name": "Upgrade #30",
+    "name": "Final Countdown",
     "cost": 200_000_000,
     "bought": False,
     "requirement": lambda: total_souls_spent >= 500_000_000,

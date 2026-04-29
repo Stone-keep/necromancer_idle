@@ -18,7 +18,7 @@ def build_save_dictionary():
                        "vampire_and_lich_per_wraith_scaling": game_state.vampire_and_lich_per_wraith_scaling,
                        "vampire_tick_rate": game_state.vampire_tick_rate,
                        "lich_summoning": game_state.lich_summoning,
-                       "lich_summoning_wraith": game_state.lich_summoning,
+                       "lich_summoning_wraith": game_state.lich_summoning_wraith,
                        "souls_gained_on_spend": game_state.souls_gained_on_spend,
                        "undead_king_unlocked": game_state.undead_king_unlocked,
                        "victory_achieved": game_state.victory_achieved,

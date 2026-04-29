@@ -3,12 +3,15 @@ from tkinter import ttk
 import game_state, game_logic, save_system, style
 
 def game_loop():
+    tickrate = game_logic.tickrate_after_vampires(game_state.tick_rate)
+    if game_state.game_paused:
+        root.after(tickrate, game_loop)
+        return
     game_state.tick_count += 1
     passive_gain = game_logic.total_passive_gain()
     game_logic.gain_souls(passive_gain)
     unlock_undead()
     update_ui()
-    tickrate = game_logic.tickrate_after_vampires(game_state.tick_rate)
     root.after(tickrate, game_loop)
 
 def auto_save():
@@ -59,6 +62,7 @@ def update_ui():
     souls_multiplier_stat.config(text=f"{game_state.souls_multiplier * game_logic.souls_for_ticks_multiplier():.2f}x")
     tick_rate_stat.config(text=f"{(1000 / game_logic.tickrate_after_vampires(game_state.tick_rate)):.2f}")
     total_ticks_stat.config(text=f"{game_state.tick_count:,}")
+    time_passed_stat.config(text=f"{(game_state.tick_count / (1000 / game_logic.tickrate_after_vampires(game_state.tick_rate)) // 60):.0f} minutes")
     click_power_stat.config(text=f"{game_logic.decimal_or_commas(game_state.click_power + (game_state.click_passive_scaling * game_logic.total_passive_gain()) * game_state.souls_multiplier)}")
     total_clicks_stat.config(text=f"{game_state.click_count:,}")
 
@@ -227,17 +231,16 @@ def create_undead_buttons():
             label.grid(row=new_button_row, column=2, pady=(10, 0), padx=(30, 0), sticky="ew")
             new_button_row += 1
     if game_state.total_souls_gained >= 500_000_000 and "undead_king" not in undead_buttons:
-        victory_button = tk.Button(undead_content, text="Summon Undead King\nCost: 1,000,000,000", command=trigger_victory, state="disabled", **style.shop_button_style)
-        victory_label = tk.Label(undead_content, text="Victory is near...", font=style.undead_button_label_font, bg=style.background_color, fg=style.text_color, justify="center")
+        game_state.undead_king_unlocked = True
+        victory_button = tk.Button(undead_content, text="Summon The Undead King and Claim Victory\n(Cost: 1,000,000,000)", command=trigger_victory, state="disabled", **style.shop_button_style)
         undead_buttons["undead_king"] = {
-            "button": victory_button,
-            "label": victory_label
+            "button": victory_button
             }
         victory_button.grid(row=new_button_row, column=1, columnspan=2, pady=(10, 0), sticky="ew")
-        victory_label.grid(row=new_button_row+1, column=1, columnspan=2, pady=(10, 0), sticky="ew")
 
 
 def update_undead_buttons():
+    undead_king_button = undead_buttons["undead_king"]["button"]
     for undead in game_state.undead_list:
         name = undead.name
         if name not in undead_buttons:
@@ -247,9 +250,10 @@ def update_undead_buttons():
         button.config(text=f"Raise {undead.name}\n(Cost: {undead.cost:,})")
         label.config(text=game_logic.undead_button_production(undead))    
         game_logic.update_button_state(button, undead.cost)
-    if "undead_king" in undead_buttons:
-        game_logic.update_button_state(undead_buttons["undead_king"]["button"], 1_000_000_000)
-
+    if "undead_king" in undead_buttons and game_state.victory_achieved is False:
+        game_logic.update_button_state(undead_king_button, 1_000_000_000)
+    elif game_state.victory_achieved is True:
+        undead_king_button.config(text="Undead King Has Risen\nTo Rule Over The World", state="disabled")
 
 # Upgrades Tab
 upgrades_content = tk.Frame(upgrades_tab, bg=style.background_color)
@@ -310,14 +314,18 @@ total_ticks_label = tk.Label(stats_content, text="Total Ticks:", font=style.stat
 total_ticks_label.grid(row=4, column=1, sticky="w")
 total_ticks_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
 total_ticks_stat.grid(row=4, column=2, sticky="e")
+time_passed_label = tk.Label(stats_content, text="Time Passed:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
+time_passed_label.grid(row=5, column=1, sticky="w")
+time_passed_stat = tk.Label(stats_content, text="0s", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
+time_passed_stat.grid(row=5, column=2, sticky="e")
 click_power_label = tk.Label(stats_content, text="Click Power:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
-click_power_label.grid(row=5, column=1, sticky="w")
+click_power_label.grid(row=6, column=1, sticky="w")
 click_power_stat = tk.Label(stats_content, text="0.1", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
-click_power_stat.grid(row=5, column=2, sticky="e")
+click_power_stat.grid(row=6, column=2, sticky="e")
 total_clicks_label = tk.Label(stats_content, text="Total Clicks:", font=style.stats_label_font, bg=style.background_color, fg=style.text_color)
-total_clicks_label.grid(row=6, column=1, sticky="w")
+total_clicks_label.grid(row=7, column=1, sticky="w")
 total_clicks_stat = tk.Label(stats_content, text="0", font=style.stats_dynamic_font, bg=style.background_color, fg=style.text_color)
-total_clicks_stat.grid(row=6, column=2, sticky="e")
+total_clicks_stat.grid(row=7, column=2, sticky="e")
 
 # Info Tab
 info_content = tk.Frame(info_tab, bg=style.background_color)
@@ -327,23 +335,53 @@ info_label.pack()
 
 # Victory Pop-Up
 def trigger_victory():
-    root.update_idletasks()
-    root_x = root.winfo_x()
-    root_y = root.winfo_y()
-    root_width = root.winfo_width()
-    root_height = root.winfo_height()
-    popup_x = root_x + (root_width // 2) - 200
-    popup_y = root_y + (root_height // 2) - 200
-    victory_window = tk.Toplevel(root)
+    if game_state.souls < 1_000_000_000:
+        return
+    game_logic.spend_souls(1_000_000_000)
+    game_state.victory_achieved = False
+    game_state.game_paused = True
+    def continue_after_victory():
+        victory_window.destroy()
+        game_state.game_paused = False
+
+    # Create Victory Window
+    victory_window = tk.Toplevel(root)  
     victory_window.title("Victory!")
-    victory_window.geometry(f"400x400+{popup_x}+{popup_y}")
     victory_window.resizable(False, False)
-    victory_window.overrideredirect(True)
-    victory_window.transient(root)
-    victory_window.configure(bg=style.background_color)
+    victory_window.configure(bg=style.border_color)
     victory_window.grab_set()
-    victory_frame = tk.Frame(victory_window, bg=style.background_color, padx=20, pady=20)
-    victory_frame.pack()
+    victory_content = tk.Frame(victory_window, bg=style.background_color, padx=20, pady=20)
+    victory_content.pack(padx=3, pady=3, fill="both")
+
+    # Victory Text
+    victory_title = tk.Label(victory_content, text="The Undead King Has Risen", font=style.victory_title_font, bg=style.background_color, fg=style.notification_undead_color, justify="center")
+    victory_title.pack(pady=(0, 10))
+    victory_flavor = tk.Label(victory_content, text=style.victory_text_flavor, font=style.victory_text_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=350)
+    victory_flavor.pack()
+    victory_meta = tk.Label(victory_content, text=style.victory_text_meta, font=style.victory_text_font, bg=style.background_color, fg=style.text_color, justify="left", wraplength=350)
+    victory_meta.pack()
+
+    # Victory Buttons
+    continue_button = tk.Button(victory_content, text="Continue", command=continue_after_victory, **style.collect_button_style)
+    continue_button.pack()
+    exit_button = tk.Button(victory_content, text="Exit", command=close_and_save, **style.collect_button_style)
+    exit_button.pack(pady=(20, 0))
+
+    # Resize Victory Window
+    root.update_idletasks()
+    victory_window.update_idletasks()
+    root_x = root.winfo_rootx()
+    root_y = root.winfo_rooty()
+    root_width = root.winfo_reqwidth()
+    root_height = root.winfo_reqheight()
+    popup_width = victory_window.winfo_reqwidth()
+    popup_height = victory_window.winfo_reqheight()
+    popup_x = root_x + (root_width // 2) - (popup_width // 2) + 15
+    popup_y = root_y + (root_height // 2) - (popup_height // 2)
+    victory_window.geometry(f"{popup_width}x{popup_height}+{popup_x}+{popup_y}")
+    victory_window.transient(root)
+    victory_window.overrideredirect(True)
+
 
 update_ui()
 game_loop()

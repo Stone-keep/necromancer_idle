@@ -14,46 +14,66 @@ def can_buy_upgrade(upgrade):
     return is_upgrade_unlocked(upgrade) and game_state.souls >= upgrade["cost"] and not upgrade["bought"]
 
 def apply_upgrade_effect(upgrade):
+    # Click Upgrades
     if upgrade["effect_type"] == "click_power":
         game_state.click_power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "click_passive_scaling":
+        game_state.click_passive_scaling += upgrade["effect_value"]
+    
+    # Undead Power Upgrades
     elif upgrade["effect_type"] == "skeleton_power":
         game_state.skeleton.power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "zombie_power":
         game_state.zombie.power *= upgrade["effect_value"]
     elif upgrade["effect_type"] == "wraith_power":
         game_state.wraith.power *= upgrade["effect_value"]
-    elif upgrade["effect_type"] == "souls_multiplier":
-        game_state.souls_multiplier *= upgrade["effect_value"]
-    elif upgrade["effect_type"] == "tick_rate":
-        game_state.tick_rate = int(game_state.tick_rate * upgrade["effect_value"])
-    elif upgrade["effect_type"] == "skeleton_cost_multiplier":
-        game_state.skeleton.cost_multiplier = float(game_state.skeleton.cost_multiplier - upgrade["effect_value"])
-        game_state.skeleton.recalculate_cost()
-    elif upgrade["effect_type"] == "zombie_cost_multiplier":
-        game_state.zombie.cost_multiplier = float(game_state.zombie.cost_multiplier - upgrade["effect_value"])
-        game_state.zombie.recalculate_cost()
-    elif upgrade["effect_type"] == "skeleton_multiplier":
-        game_state.skeleton.global_multiplier += float(upgrade["effect_value"])
     elif upgrade["effect_type"] == "skeleton_zombie_power":
         game_state.skeleton.power *= upgrade["effect_value"]
         game_state.zombie.power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "vampire_wraith_power":
+        game_state.vampire.power *= upgrade["effect_value"]
+        game_state.wraith.power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "skeleton_wraith_power":
+        game_state.skeleton.power *= upgrade["effect_value"]
+        game_state.wraith.power *= upgrade["effect_value"]
+
+    # Undead Cost Scaling Upgrades
+    elif upgrade["effect_type"] == "skeleton_cost_multiplier":
+        game_state.skeleton.cost_multiplier = game_state.skeleton.cost_multiplier - upgrade["effect_value"]
+        game_state.skeleton.recalculate_cost()
+    elif upgrade["effect_type"] == "zombie_cost_multiplier":
+        game_state.zombie.cost_multiplier = game_state.zombie.cost_multiplier - upgrade["effect_value"]
+        game_state.zombie.recalculate_cost()
     elif upgrade["effect_type"] == "wraith_per_zombie_scaling":
         game_state.wraith_per_zombie_scaling += upgrade["effect_value"]
         game_state.wraith.recalculate_cost()
-    elif upgrade["effect_type"] == "wraith_multiplier":
-        game_state.wraith.global_multiplier += upgrade["effect_value"]
-    elif upgrade["effect_type"] == "click_passive_scaling":
-        game_state.click_passive_scaling += upgrade["effect_value"]
-    elif upgrade["effect_type"] == "souls_tick_multiplier":
-        game_state.souls_tick_multiplier += upgrade["effect_value"]
     elif upgrade["effect_type"] == "skeletons_per_vampire_scaling":
         game_state.skeletons_per_vampire_scaling += upgrade["effect_value"]
         game_state.skeleton.recalculate_cost()
-    elif upgrade["effect_type"] == "vampire_wraith_power":
-        game_state.vampire.power *= upgrade ["effect_value"]
-        game_state.wraith.power *= upgrade["effect_value"]
+    elif upgrade["effect_type"] == "vampire_and_lich_per_wraith_scaling":
+        game_state.vampire_and_lich_per_wraith_scaling += upgrade["effect_value"]
+        game_state.vampire.recalculate_cost()
+        game_state.lich.recalculate_cost()
+
+    # Souls Multiplier Upgrades
+    elif upgrade["effect_type"] == "souls_multiplier":
+        game_state.souls_multiplier *= upgrade["effect_value"]    
+    elif upgrade["effect_type"] == "skeleton_multiplier":
+        game_state.skeleton.global_multiplier += float(upgrade["effect_value"])
+    elif upgrade["effect_type"] == "wraith_multiplier":
+        game_state.wraith.global_multiplier += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "souls_tick_multiplier":
+        game_state.souls_tick_multiplier += upgrade["effect_value"]
+    elif upgrade["effect_type"] == "lich_multiplier":
+        game_state.lich.global_multiplier += upgrade["effect_value"]
+
+    # Tick Rate Upgrades
+    elif upgrade["effect_type"] == "tick_rate":
+        game_state.tick_rate = int(game_state.tick_rate * upgrade["effect_value"])
     elif upgrade["effect_type"] == "vampire_tick_rate":
         game_state.vampire_tick_rate += upgrade["effect_value"]
+
+    # Miscellaneous Upgrades
     elif upgrade["effect_type"] == "lich_summoning":
         game_state.lich_summoning += upgrade["effect_value"]
         game_state.skeleton.count += game_state.lich.count
@@ -64,19 +84,12 @@ def apply_upgrade_effect(upgrade):
         game_state.lich_summoning_wraith += upgrade["effect_value"]
         game_state.wraith.count += game_state.lich.count
         game_state.wraith.recalculate_cost()
-    elif upgrade["effect_type"] == "vampire_and_lich_per_wraith_scaling":
-        game_state.vampire_and_lich_per_wraith_scaling += upgrade["effect_value"]
-        game_state.vampire.recalculate_cost()
-        game_state.lich.recalculate_cost()
     elif upgrade["effect_type"] == "souls_gained_on_spend":
         game_state.souls_gained_on_spend += upgrade["effect_value"]
-    elif upgrade["effect_type"] == "lich_multiplier":
-        game_state.lich.global_multiplier += upgrade["effect_value"]
-    elif upgrade["effect_type"] == "skeleton_wraith_power":
-        game_state.skeleton.power *= upgrade["effect_value"]
-        game_state.wraith.power *= upgrade["effect_value"]
+    
+    # Upgrade Not Found
     else:
-        raise ValueError("Upgrade effect type not found")
+        raise ValueError(f"Upgrade effect type not found: {upgrade['effect_type']}")
 
 def buy_upgrade(upgrade):
     if can_buy_upgrade(upgrade):
@@ -109,7 +122,7 @@ def spend_souls(cost):
     if game_state.souls_gained_on_spend > 0:
         game_state.souls = round(game_state.souls - cost, 1)
         game_state.total_souls_spent = round(game_state.total_souls_spent + cost, 1)
-        game_state.souls = round(game_state.souls + game_state.souls_gained_on_spend * cost)
+        game_state.souls = round(game_state.souls + game_state.souls_gained_on_spend * cost, 1)
     else:
         game_state.souls = round(game_state.souls - cost, 1)
         game_state.total_souls_spent = round(game_state.total_souls_spent + cost, 1)
