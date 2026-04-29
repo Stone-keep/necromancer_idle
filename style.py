@@ -1,5 +1,3 @@
-import game_state
-
 background_color = "black"
 soul_color = "#9fe8d8"
 text_color = "#e6fff8"
