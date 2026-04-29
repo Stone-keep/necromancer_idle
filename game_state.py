@@ -56,7 +56,7 @@ upgrades = [
 },
 {
     "id": 3,
-    "name": "Don't Dead Open Inside",
+    "name": "Braaaains!",
     "cost": 200,
     "bought": False,
     "requirement": lambda: zombie.count >= 10,
@@ -66,7 +66,7 @@ upgrades = [
 },
 {
     "id": 4,
-    "name": "Upgrade #4",
+    "name": "Finger of Death",
     "cost": 250,
     "bought": False,
     "requirement": lambda: click_count >= 250,
@@ -76,7 +76,7 @@ upgrades = [
 },
 {
     "id": 5,
-    "name": "Upgrade #5",
+    "name": "Soul Food",
     "cost": 500,
     "bought": False,
     "requirement": lambda: total_souls_gained >= 1000,
@@ -86,23 +86,23 @@ upgrades = [
 },
 {
     "id": 6,
-    "name": "Upgrade #6",
+    "name": "Gotta Go Fast",
     "cost": 1000,
     "bought": False,
     "requirement": lambda: tick_count >= 240,
     "effect_type": "tick_rate",
-    "effect_value": 0.8,
-    "description": "Decreases the Tick Rate by 20% (everything becomes faster)."
+    "effect_value": 0.85,
+    "description": "Decreases the Tick Rate by 15% (everything becomes faster)."
 },
 {
     "id": 7,
-    "name": "Good Bones",
+    "name": "Bare-Bones Budget",
     "cost": 2000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 20,
     "effect_type": "skeleton_cost_multiplier",
     "effect_value": 0.1,
-    "description": "Reduces the cost scaling of Skeletons by 0.1"
+    "description": "Reduces the cost scaling of Skeletons by 0.1."
 },
 {
     "id": 8,
@@ -116,7 +116,7 @@ upgrades = [
 },
 {
     "id": 9,
-    "name": "Upgrade #9",
+    "name": "28 Souls Later",
     "cost": 4000,
     "bought": False,
     "requirement": lambda: zombie.count >= 20,
@@ -126,7 +126,7 @@ upgrades = [
 },
 {
     "id": 10,
-    "name": "Upgrade #10",
+    "name": "Resident Devil",
     "cost": 6666,
     "bought": False,
     "requirement": lambda: click_count >= 1300,
@@ -136,7 +136,7 @@ upgrades = [
 },
 {
     "id": 11,
-    "name": "Upgrade #11",
+    "name": "Don't Dead Open Inside",
     "cost": 8000,
     "bought": False,
     "requirement": lambda: zombie.count >= 30,
@@ -146,7 +146,7 @@ upgrades = [
 },
 {
     "id": 12,
-    "name": "Upgrade #12",
+    "name": "Bone Apple Tea",
     "cost": 11111,
     "bought": False,
     "requirement": lambda: skeleton.count >= 40,
@@ -156,7 +156,7 @@ upgrades = [
 },
 {
     "id": 13,
-    "name": "Upgrade #13",
+    "name": "Necroeconomics",
     "cost": 13000,
     "bought": False,
     "requirement": lambda: wraith.count >= 5,
@@ -166,7 +166,7 @@ upgrades = [
 },
 {
     "id": 14,
-    "name": "Upgrade #14",
+    "name": "Phantom Menace",
     "cost": 20000,
     "bought": False,
     "requirement": lambda: wraith.count >= 10,
@@ -176,7 +176,7 @@ upgrades = [
 },
 {
     "id": 15,
-    "name": "Upgrade #15",
+    "name": "Thriller Night",
     "cost": 28000,
     "bought": False,
     "requirement": lambda: zombie.count >= 35,
@@ -186,7 +186,7 @@ upgrades = [
 },
 {
     "id": 16,
-    "name": "Upgrade #16",
+    "name": "Click or Treat",
     "cost": 33000,
     "bought": False,
     "requirement": lambda: click_count >= 2000,
@@ -196,37 +196,37 @@ upgrades = [
 },
 {
     "id": 17,
-    "name": "Upgrade #17",
+    "name": "Ghost In The Machine",
     "cost": 50000,
     "bought": False,
     "requirement": lambda: wraith.count >= 15,
     "effect_type": "wraith_multiplier",
     "effect_value": 0.02,
-    "description": "Each Wraith increases Souls harvest of all Undead by 2%"
+    "description": "Each Wraith increases Souls harvest of all Undead by 2%."
 },
 {
     "id": 18,
-    "name": "Upgrade #18",
+    "name": "Time Warp",
     "cost": 66666,
     "bought": False,
     "requirement": lambda: total_souls_spent >= 600_000,
     "effect_type": "souls_tick_multiplier",
     "effect_value": 0.002,
-    "description": "Increases the Souls harvest by 0.2% per 10 game Ticks"
+    "description": "Increases the Souls harvest by 0.2% per 10 game Ticks."
 },
 {
     "id": 19,
-    "name": "Upgrade #19",
-    "cost": 91100,
+    "name": "Tick Tick Boom",
+    "cost": 90000,
     "bought": False,
     "requirement": lambda: tick_count >= 1200,
     "effect_type": "tick_rate",
-    "effect_value": 0.9,
-    "description": "Decreases the Tick Rate by 10% (everything becomes faster)."
+    "effect_value": 0.85,
+    "description": "Decreases the Tick Rate by 15% (everything becomes faster)."
 },
 {
     "id": 20,
-    "name": "Upgrade #20",
+    "name": "Soul Survivor",
     "cost": 150_000,
     "bought": False,
     "requirement": lambda: total_souls_gained >= 1_200_000,
@@ -236,17 +236,17 @@ upgrades = [
 },
 {
     "id": 21,
-    "name": "Upgrade #20",
+    "name": "Stakeholder Value",
     "cost": 300_000,
     "bought": False,
     "requirement": lambda: vampire.count >= 5,
     "effect_type": "skeletons_per_vampire_scaling",
     "effect_value": 0.005,
-    "description": "Each Vampire reduces the Cost scaling of Skeletons by 0.005."
+    "description": "Each Vampire reduces the cost scaling of Skeletons by 0.005."
 },
 {
     "id": 22,
-    "name": "Upgrade #21",
+    "name": "Spooky Scary Skeletons",
     "cost": 400_000,
     "bought": False,
     "requirement": lambda: skeleton.count >= 60,
@@ -256,7 +256,7 @@ upgrades = [
 },
 {
     "id": 23,
-    "name": "Upgrade #22",
+    "name": "Night Shift",
     "cost": 800_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 25,
@@ -266,7 +266,7 @@ upgrades = [
 },
 {
     "id": 24,
-    "name": "Upgrade #23",
+    "name": "Count von Count",
     "cost": 1_500_000,
     "bought": False,
     "requirement": lambda: vampire.count >= 10,
@@ -276,7 +276,7 @@ upgrades = [
 },
 {
     "id": 25,
-    "name": "Upgrade #24",
+    "name": "Graveyard Smash",
     "cost": 2_500_000,
     "bought": False,
     "requirement": lambda: lich.count >= 1,
@@ -286,7 +286,7 @@ upgrades = [
 },
 {
     "id": 26,
-    "name": "Upgrade #24",
+    "name": "Got Red on You",
     "cost": 3_000_000,
     "bought": False,
     "requirement": lambda: zombie.count >= 60,
@@ -296,7 +296,7 @@ upgrades = [
 },
 {
     "id": 27,
-    "name": "Upgrade #25",
+    "name": "Hand of Glory",
     "cost": 5_000_000,
     "bought": False,
     "requirement": lambda: click_count >= 4000,
@@ -306,17 +306,17 @@ upgrades = [
 },
 {
     "id": 28,
-    "name": "Upgrade #26",
+    "name": "Dragula",
     "cost": 10_000_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 35,
     "effect_type": "vampire_and_lich_per_wraith_scaling",
     "effect_value": 0.002,
-    "description": "Each Wraith reduces the Cost scaling of Vampires and Liches by 0.002."
+    "description": "Each Wraith reduces the cost scaling of Vampires and Liches by 0.002."
 },
 {
     "id": 29,
-    "name": "Upgrade #27",
+    "name": "Harvest Moon",
     "cost": 20_000_000,
     "bought": False,
     "requirement": lambda: total_souls_spent >= 80_000_000,
@@ -326,7 +326,7 @@ upgrades = [
 },
 {
     "id": 30,
-    "name": "Upgrade #27",
+    "name": "Don't Fear The Reaper",
     "cost": 40_000_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 40,
@@ -336,7 +336,7 @@ upgrades = [
 },
 {
     "id": 31,
-    "name": "Upgrade #28",
+    "name": "Liches Get Riches",
     "cost": 60_000_000,
     "bought": False,
     "requirement": lambda: lich.count >= 10,
@@ -346,7 +346,7 @@ upgrades = [
 },
 {
     "id": 32,
-    "name": "Upgrade #29",
+    "name": "Bone to Be Wild",
     "cost": 100_000_000,
     "bought": False,
     "requirement": lambda: wraith.count >= 50,
