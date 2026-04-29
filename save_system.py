@@ -3,7 +3,9 @@ import json
 from pathlib import Path
 
 def build_save_dictionary():
-    save_dictionary = {"tick_rate": game_state.tick_rate,
+    save_dictionary = {
+                       "time_passed_seconds": game_state.time_passed_seconds,
+                       "tick_rate": game_state.tick_rate,
                        "tick_count": game_state.tick_count,
                        "souls": game_state.souls,
                        "souls_multiplier": game_state.souls_multiplier,
@@ -46,6 +48,7 @@ def build_save_dictionary():
 
 def load_save_from_dictionary(save_dictionary):
     #Loading Global Variables
+    game_state.time_passed_seconds = float(save_dictionary["time_passed_seconds"])
     game_state.tick_rate = int(save_dictionary["tick_rate"])
     game_state.tick_count = int(save_dictionary["tick_count"])
     game_state.souls = float(save_dictionary["souls"])

@@ -33,8 +33,9 @@ def apply_upgrade_effect(upgrade):
     elif upgrade["effect_type"] == "vampire_wraith_power":
         game_state.vampire.power *= upgrade["effect_value"]
         game_state.wraith.power *= upgrade["effect_value"]
-    elif upgrade["effect_type"] == "skeleton_wraith_power":
+    elif upgrade["effect_type"] == "skeleton_zombie_wraith_power":
         game_state.skeleton.power *= upgrade["effect_value"]
+        game_state.zombie.power *= upgrade["effect_value"]
         game_state.wraith.power *= upgrade["effect_value"]
 
     # Undead Cost Scaling Upgrades
@@ -120,15 +121,17 @@ def gain_souls(amount):
 
 def spend_souls(cost):
     if game_state.souls_gained_on_spend > 0:
+        souls_on_spend = game_state.souls_gained_on_spend * cost
         game_state.souls = round(game_state.souls - cost, 1)
         game_state.total_souls_spent = round(game_state.total_souls_spent + cost, 1)
-        game_state.souls = round(game_state.souls + game_state.souls_gained_on_spend * cost, 1)
+        game_state.souls = round(game_state.souls + souls_on_spend, 1)
+        game_state.total_souls_gained = round(game_state.total_souls_gained + souls_on_spend, 1)
     else:
         game_state.souls = round(game_state.souls - cost, 1)
         game_state.total_souls_spent = round(game_state.total_souls_spent + cost, 1)
 
 def collect_soul_click():
-    passive_scaling = game_state.click_passive_scaling * total_passive_gain()
+    passive_scaling = game_state.click_passive_scaling * total_passive_gain() * (1000 / tickrate_after_vampires(game_state.tick_rate))
     game_state.click_count += 1
     gain_souls(game_state.click_power + passive_scaling)
     
@@ -172,7 +175,7 @@ def true_cost_multiplier(undead):
     if undead.name == "Lich":
         multiplier -= game_state.vampire_and_lich_per_wraith_scaling * game_state.wraith.count
         
-    return max(multiplier, 1.1)
+    return max(multiplier, 1.08)
 
 def recalculate_all_undead_cost():
     for undead in game_state.undead_list:
