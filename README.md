@@ -6,8 +6,6 @@ Raise undead servants, harvest Souls, unlock upgrades, accelerate your necromant
 
 **Necromancer Idle** was my first personal game project and a learning project focused on Python programming, simple UI development, game design and balancing, and software structure.
 
-![Early Game](screenshots/main_ui.png)
-
 ---
 
 ## Installation / Running The Game
@@ -150,7 +148,18 @@ The code is pretty messy and if I started from the scratch, I would do many thin
 
 ## Screenshots
 
+### Early Game:
+
 ![Early Game](screenshots/early_game.png)
+
+### Late Game:
+
 ![Late Game](screenshots/late_game.png)
+
+### Stats Tab:
+
 ![Stats Tab](screenshots/stats.png)
+
+### Victory Screen:
+
 ![Victory Screen](screenshots/victory.png)
