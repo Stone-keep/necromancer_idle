@@ -6,6 +6,8 @@ Raise undead servants, harvest Souls, unlock upgrades, accelerate your necromant
 
 **Necromancer Idle** was my first personal game project and a learning project focused on Python programming, simple UI development, game design and balancing, and software structure.
 
+![Early Game](screenshots/main_ui.png)
+
 ---
 
 ## Installation / Running The Game
@@ -62,6 +64,12 @@ sudo apt install python3-tk
 ```
 
 ---
+
+## Download
+
+You can also download a Windows .exe file pre-built using PyInstaller here:
+
+[**Download Necromancer Idle**](https://github.com/Stone-keep/necromancer_idle/releases/tag/v1.0)
 
 ## Gameplay
 
@@ -139,3 +147,10 @@ The code is pretty messy and if I started from the scratch, I would do many thin
 - Managing the save file and handling exceptions.
 - Loading game state back into dictionaries, variables and classes.
 - Auto-save and shutdown handling.
+
+## Screenshots
+
+![Early Game](screenshots/early_game.png)
+![Late Game](screenshots/late_game.png)
+![Stats Tab](screenshots/stats.png)
+![Victory Screen](screenshots/victory.png)
