@@ -4,7 +4,7 @@ A short dark-fantasy incremental game built in Python and Tkinter.
 
 Raise undead servants, harvest Souls, unlock upgrades, accelerate your necromantic engine, and ultimately summon the Undead King.
 
-**Necromancer Idle** was my first personal game project and a learning project focused on Python programming, simple UI development, game design and balancing, and software structure.
+**Necromancer Idle** was my first personal project, used as a first steps in Python project management, simple visual UI creation and game design/balancing.
 
 ---
 
@@ -145,6 +145,8 @@ The code is pretty messy and if I started from the scratch, I would do many thin
 - Managing the save file and handling exceptions.
 - Loading game state back into dictionaries, variables and classes.
 - Auto-save and shutdown handling.
+
+---
 
 ## Screenshots
 
